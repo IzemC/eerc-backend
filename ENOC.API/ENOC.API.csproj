@@ -14,11 +14,13 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.8" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ENOC.Application\ENOC.Application.csproj" />
     <ProjectReference Include="..\ENOC.Infrastructure\ENOC.Infrastructure.csproj" />
+    <ProjectReference Include="..\ENOC.Domain\ENOC.Domain.csproj" />
   </ItemGroup>
 
 </Project>

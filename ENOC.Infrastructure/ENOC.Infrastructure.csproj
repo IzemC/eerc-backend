@@ -2,6 +2,15 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ENOC.Application\ENOC.Application.csproj" />
+    <ProjectReference Include="..\ENOC.Domain\ENOC.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
+    <PackageReference Include="System.DirectoryServices" Version="9.0.8" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="9.0.8" />
   </ItemGroup>
 
   <PropertyGroup>
