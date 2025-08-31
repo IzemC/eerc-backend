@@ -1,17 +1,17 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
-COPY ["ENOC.dashboard.csproj", "ENOC.dashboard/"]
+COPY ["ENOC.Dashboard.csproj", "ENOC.Dashboard/"]
 
-RUN dotnet restore "ENOC.dashboard/ENOC.dashboard.csproj"
+RUN dotnet restore "ENOC.Dashboard/ENOC.Dashboard.csproj"
 
-COPY [".", "ENOC.dashboard/"]
+COPY [".", "ENOC.Dashboard/"]
 
-WORKDIR "/src/ENOC.dashboard"
-RUN dotnet build "ENOC.dashboard.csproj" -c Release -o /app/build
+WORKDIR "/src/ENOC.Dashboard"
+RUN dotnet build "ENOC.Dashboard.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "ENOC.dashboard.csproj" -c Release -o /app/publish
+RUN dotnet publish "ENOC.Dashboard.csproj" -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
@@ -22,4 +22,4 @@ USER appuser
 COPY --from=publish /app/publish .
 EXPOSE 8080
 ENV ASPNETCORE_HTTP_PORTS=8080
-ENTRYPOINT ["dotnet", "ENOC.dashboard.dll"]
+ENTRYPOINT ["dotnet", "ENOC.Dashboard.dll"]
