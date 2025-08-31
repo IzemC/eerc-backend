@@ -32,3 +32,18 @@
   text-align: center;
   margin-inline: auto;
 }
+
+.dashboard-cards {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  row-gap: 60px;
+  column-gap: 22px;
+  a {
+    display: flex;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 312px;
+  }
+}
