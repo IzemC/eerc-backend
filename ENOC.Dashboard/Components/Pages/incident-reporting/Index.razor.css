@@ -1,0 +1,172 @@
+.title {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 36px;
+  line-height: 34px;
+  /* or 94% */
+  letter-spacing: 1px;
+  color: #ffffff;
+}
+
+.description {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 24px;
+  line-height: 34px;
+  /* or 94% */
+  letter-spacing: 1px;
+  color: #ffffff;
+}
+
+.middle-center-container {
+  margin-top: 190px;
+}
+
+.circle-bg {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  overflow: visible;
+  svg {
+    stroke-width: 3px;
+    stroke: #c9b685;
+  }
+}
+.half-circle {
+  position: relative;
+}
+
+.steps-container {
+  pointer-events: none;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  transform: translateY(-250px);
+}
+
+.ticked {
+  position: absolute;
+  top: 0;
+  left: 65%;
+}
+
+.step-current {
+  width: 125px;
+  height: 125px;
+  .step-content {
+    width: 125px;
+    height: 125px;
+    --translate-y: -15px !important;
+  }
+  span {
+    display: none;
+  }
+  .circle-title {
+    position: static;
+    font-size: 23px;
+    line-height: 120%;
+  }
+  /* .step-content:hover {
+    --scale: 1;
+  } */
+}
+
+.step-confirmed {
+  .step-content {
+    background: #26d07c;
+    /* &:hover {
+      --scale: 1 !important;
+    } */
+  }
+}
+
+.step-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 99px;
+  height: 99px;
+  background: #e11818;
+  border: 5px solid #aa9366;
+  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+  border-radius: 100%;
+}
+.step {
+  pointer-events: auto;
+  position: absolute;
+  left: 50%;
+  transform-origin: 50% 930px;
+  width: 99px;
+  height: 99px;
+  /* animation: 1.2s ease-out 0s 1 slideInFromBottom; */
+  --rot: 0deg;
+  transform: translate(-50%, var(--y-offset, 0%)) rotate(calc(var(--rot) * -1));
+  .step-content {
+    --scale: 1;
+    --translate-x: 0;
+    --translate-y: 0;
+    transform: translate(var(--translate-x), var(--translate-y))
+      rotate(var(--rot)) scale(var(--scale));
+    /* &:hover {
+      --scale: 1.1;
+    } */
+  }
+}
+
+.step-hover {
+  cursor: pointer;
+  &:hover {
+    --scale: 1.1;
+  }
+}
+
+.step-one {
+  --rot: 30deg;
+}
+.step-two {
+  --rot: 15deg;
+}
+.step-three {
+  --rot: 0deg;
+}
+.step-four {
+  --rot: -15deg;
+}
+.step-five {
+  --rot: -30deg;
+}
+
+@keyframes slideInFromBottom {
+  0% {
+    --y-offset: 30%;
+  }
+
+  100% {
+    --y-offset: 0%;
+  }
+}
+
+span {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 28px;
+  color: #ffffff;
+}
+
+.circle-title {
+  position: absolute;
+  top: -40%;
+  width: 145%;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 18px;
+  color: #ffffff;
+  text-align: center;
+}

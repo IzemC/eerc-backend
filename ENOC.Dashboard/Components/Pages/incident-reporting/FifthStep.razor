@@ -1,0 +1,15 @@
+<div class="buttons">
+    <div class="rect-button">
+        Close the  <br/> incident
+    </div>
+    <div class="rect-button">
+        Stand down
+    </div>
+</div>
+
+            <button id="form-button" class="btn btn-secondary btn-aqua rect-button-confirm submit-button incident-form-button"  @onclick="onConfirm">Confirm</button>
+
+@code{
+    [Parameter]
+    public Func<Task> onConfirm {get; set;}
+}

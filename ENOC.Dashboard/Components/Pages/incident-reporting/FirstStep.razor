@@ -1,0 +1,85 @@
+<form id="form" method="post">
+    <div class="row">
+        <div class="col-12">
+            <h3 class="header-font">Incident type</h3>
+        </div>
+    </div>
+
+    <div class="row" id="incidentTypes" style="padding-bottom: 28px;">
+        @foreach (var incidentType in @IncidentTypes)
+        {
+            <div class="col-and-half">
+                <a href="#" class="incident-type" data-id="@incidentType.Id">
+                    <div class="rect-img" style="background:linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%), url('@incidentType.Image');">
+                        <div class="rect-img-blur">
+                            <span class="rect-img-font">@incidentType.Name</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h3 class="header-font">Business Unit</h3>
+        </div>
+    </div>
+
+    <div class="container-fluid" style="position:relative; padding-bottom: 42px;">
+        <div class="row">
+            @foreach (var unit in Units)
+            {
+                <div class="col-and-half">
+                    <button type="button" class="unit btn-selection btn-aqua rect-button" data-id="@unit.Id" data-selected="@unit.IsSelected">@unit.Name</button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <input hidden type="text" name="unitId" required />
+    <input hidden type="text" name="incidentTypeId" required />
+    <input hidden type="text" name="unit" required />
+    <input hidden type="text" name="incidentType" required />
+    <button type="submit" hidden></button>
+
+            <button id="form-button" class="btn btn-secondary btn-aqua rect-button-confirm submit-button incident-form-button"  @onclick="onConfirm">Confirm</button>
+</form>
+
+@code {
+
+    [Parameter]
+    public Func<Task> onConfirm {get; set;}
+
+    private List<IncidentType> IncidentTypes = new List<IncidentType>{
+        new IncidentType{Id = "1", Name = "Fire", Image="/assets/alert-fire.png"},
+        new IncidentType{Id = "2", Name = "Smoke", Image="/assets/alert-smoke.png"},
+        new IncidentType{Id = "3", Name = "Gas Leak", Image="/assets/alert-gas-leak.png"},
+        new IncidentType{Id = "4", Name = "Chimical Leak", Image="assets/alert-chimical-leak.png"},
+        new IncidentType{Id = "5", Name = "Dangerous Goods", Image="assets/alert-dangerous-goods.png"},
+        };
+    private List<Unit> Units = new List<Unit>{
+        new Unit{Id = "1", IsSelected = true, Name = "Unit 1"},
+        new Unit{Id = "2", IsSelected = false, Name = "Unit 2"},
+        new Unit{Id = "3", IsSelected = false, Name = "Unit 3"},
+        new Unit{Id= "4", IsSelected=false, Name= "Unit 4"}
+        };
+
+
+       public class Unit {
+        public string Id { get; set; }
+        public bool IsSelected { get; set; }
+        public string Name { get; set; }    
+
+       }
+
+       public class IncidentType {
+        public string Id { get; set; }
+        public string Name { get; set; }
+      
+        public string Image {get; set;}
+
+       }
+    }
+    
+ 

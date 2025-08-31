@@ -1,0 +1,201 @@
+@page "/incident-reporting"
+
+@rendermode InteractiveServer
+
+@using ENOC.Dashboard.Components.Layout
+
+
+<PageTitle>Incident Alert Management System</PageTitle>
+
+<HeaderNav Title="Incident Alert Management System"/>
+
+
+<div class="page-container">
+    @* <FirstStep onConfirm="ConfirmStep"/> *@
+    @if (currentStep == 0){
+       <div class="middle-center-container">
+        <div class="row">
+            <div class="col-xl-12 text-center">
+                <p class="title">
+                    @TitleMessage
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xl-12 text-center">
+                <p class="description">
+                    Go through the system step by step in order to complete the whole process
+                </p>
+            </div>
+        </div>
+    </div>
+    }
+    @if (currentStep == 1){
+        <FirstStep onConfirm="ConfirmStep"/>
+    }
+    @if (currentStep == 2){
+        <SecondStep onConfirm="ConfirmStep"/>
+    }
+    @if (currentStep == 3){
+        <ThirdStep onConfirm="ConfirmStep"/>
+    }
+    @if(currentStep == 4){
+        <FourthStep onConfirm="ConfirmStep"/>
+    }
+    @if(currentStep == 5){
+        <FifthStep onConfirm="ConfirmStep"/>
+    }
+    @if(currentStep == 6){
+        <ReportDetails onConfirm="ConfirmStep"/>
+    }
+
+    <div class="steps-container">
+        <div class="half-circle">
+            <svg width="1876" height="300" xmlns="http://www.w3.org/2000/svg" class="circle-bg">
+                <circle cx="0" cy="930" r="930" fill="none" stroke="#C9B685" stroke-width="3"/>
+            </svg>
+            
+            @foreach (var step in steps)
+            {
+                var positionClass = GetStepPositionClass(step.Number);
+                
+                <div class="@positionClass step @GetStepClass(step.Number)">
+                            <div class="step-content @(step.Number == currentStep + 1 ? "step-hover" : "")"  @onclick="@(e=> ConfirmStep(step.Number))">
+                                @if (StepCompleted(step.Number))
+                                {
+                                    <img src="/incident-steps-images/tick.png" class="ticked" />
+                                }
+                                <div class="circle-title">@step.Title</div>
+                                <span>@step.Number</span>
+                            </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string? currentStepStr {get; set;}
+    private int currentStep = 0;
+    private List<int> completedSteps = new List<int>();
+    private List<StepModel> steps = new List<StepModel>
+    {
+        new StepModel { Number = 1, Title = "Open incident", Link = "/incident-reporting/1" },
+        new StepModel { Number = 2, Title = "Waiting feedback", Link = "/incident-reporting/2"  },
+        new StepModel { Number = 3, Title = "Notify team", Link = "/incident-reporting/3" },
+        new StepModel { Number = 4, Title = "Manual call", Link = "/incident-reporting/4" },
+        new StepModel { Number = 5, Title = "Final action", Link = "/incident-reporting/5" }
+    };
+
+    protected override void OnParametersSet()
+    {
+        if (int.TryParse(currentStepStr, out var parsedStep))
+        {
+            currentStep = parsedStep;
+        }
+
+    }
+
+    private string TitleMessage => currentStep == 0 
+        ? "You can open a new incident by clicking on step 1" 
+        : $"Currently working on step {currentStep}";
+    
+    private bool StepCompleted(int stepNumber)
+    {
+        return stepNumber < currentStep;
+    }
+    
+    private string GetStepClass(int stepNumber)
+    {
+        if (StepCompleted(stepNumber))
+        {
+            return "step-confirmed";
+        }
+        else if (stepNumber == currentStep)
+        {
+            return "step-current";
+        }
+        return "";
+    }
+    
+    private string GetStepPositionClass(int stepNumber)
+    {
+        return $"step-{GetStepPositionName(stepNumber)}";
+    }
+    
+    private string GetStepPositionName(int stepNumber)
+    {
+        switch (stepNumber)
+        {
+            case 1: return "one";
+            case 2: return "two";
+            case 3: return "three";
+            case 4: return "four";
+            case 5: return "five";
+            default: return "";
+        }
+    }
+    
+    private async Task ConfirmStep(int stepNumber)
+    {
+        if (stepNumber == currentStep + 1)
+        {
+            currentStep++;
+            StateHasChanged();
+        } 
+    }
+        private async Task ConfirmStep()
+    {
+        currentStep++;
+        StateHasChanged();
+    }
+    
+    // This method would be called when a step is completed
+    public void CompleteCurrentStep()
+    {
+        if (currentStep > 0 && !StepCompleted(currentStep))
+        {
+            completedSteps.Add(currentStep);
+            
+            // Move to next step if available
+            if (currentStep < steps.Count)
+            {
+                currentStep++;
+            }
+            
+            StateHasChanged();
+        }
+    }
+    
+    // Example method to simulate completing steps for demonstration
+    public void SimulateStepCompletion(int upToStep)
+    {
+        completedSteps.Clear();
+        for (int i = 1; i <= upToStep; i++)
+        {
+            completedSteps.Add(i);
+        }
+        
+        if (upToStep < steps.Count)
+        {
+            currentStep = upToStep + 1;
+        }
+        else
+        {
+            currentStep = steps.Count;
+        }
+        
+        StateHasChanged();
+    }
+    
+    // Step model class
+    public class StepModel
+    {
+        public int Number { get; set; }
+        public string Title { get; set; }
+        public string Link { get; set; }
+    }
+}

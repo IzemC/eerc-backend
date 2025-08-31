@@ -1,0 +1,30 @@
+@{
+    string logoStyle = "";
+    bool isLogin = false; 
+    if (isLogin)
+    {
+        logoStyle = "width: 86px; left: 50%; transform: translate(-50%, -50%);";
+    }
+    else
+    {
+        logoStyle = "width: 118px; left: 30px; transform: translateY(-50%);";
+    }
+}
+
+<div>
+    <header class="page-header">
+        <div class="display: flex; @(isLogin ? "justify-center" : "")">
+            <a href="/">
+                <img src="@Assets["/imgs/logo.svg"]" alt="Logo" style="position: absolute; top: 50%; @logoStyle">
+            </a>
+        </div>
+        <div style="font-size: 36px; font-weight: 700; font-family:Inter; color: white; text-transform: uppercase;">
+            @Title
+        </div>
+    </header>
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+}

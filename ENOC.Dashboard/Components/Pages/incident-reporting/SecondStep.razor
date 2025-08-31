@@ -1,0 +1,58 @@
+<div>
+    <div class="row mb-3 mt-3">
+        <div class="col-xl-12 text-center">
+            <p class="title">
+                Please wait until you get the feedback to know the next action
+            </p>
+        </div>
+    </div>
+
+
+    @if (Tanks.Count > 0)
+    {
+        <div class="row mb-5">
+            <div class="col-4 offset-4 text-center">
+                <div class="form-group">
+                    <label class="input-label-font mb-2">
+                        Tank number
+                        <p class="custom-span" style="font-size: 18px !important; display:inline-block;">(optional)</p>
+                    </label>
+                    <select class="form-select" id="TankNumber" name="tankId" style="width: 100% !important;" data-selected="@SelectedTankId">
+                        <option value="" disabled selected>Pick a tank</option>
+                        @foreach (var option in Tanks)
+                        {
+                            <option value="@option.Id">@option.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="buttons">
+      
+            <button id="notifyTeam" class="btn-aqua btn-selection rect-button">Notify team</button>
+      
+            <button id="standDown" class="btn-aqua btn-selection rect-button">Stand down</button>
+        
+    </div>
+
+
+    <button id="form-button" class="btn btn-secondary btn-aqua rect-button-confirm incident-form-button"  @onclick="onConfirm">Confirm</button>
+
+</div>
+
+@code{
+    [Parameter]
+    public Func<Task> onConfirm {get; set;}
+    public string SelectedTankId = "1";
+    public List<Tank> Tanks = new List<Tank>{
+        new Tank{Id="1", Name= "Tank 1"},
+        new Tank{Id="2", Name= "Tank 2"},
+        new Tank{Id="3", Name= "Tank 3"},
+        };
+    public class Tank{
+        public string Id;
+        public string Name;
+    }
+}

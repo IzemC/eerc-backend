@@ -1,0 +1,180 @@
+.rect-button {
+  width: 100%;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 36px;
+  background: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.2)
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
+  border: none;
+  border-radius: 16px;
+}
+
+.rect-form-button {
+  width: 100%;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 36px;
+  background: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.2)
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
+  border: none;
+  border-radius: 16px;
+  color: #fff;
+}
+
+.custom-span {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 28px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.header-font {
+  color: white;
+}
+.teams-message {
+  display: flex;
+  width: 100%;
+  align-items: start;
+  gap: 60px;
+}
+
+.teams-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: calc(348px + 348px + 16px);
+  gap: 10px;
+}
+
+.teams {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  max-width: calc(348px + 348px + 16px);
+  gap: 16px;
+}
+
+.rect-img-custom {
+  flex: 1;
+  background-size: 100% 100% !important;
+  background-position: center;
+  cursor: pointer !important;
+  height: 180px;
+  border-radius: 16px;
+  transition: background-size 0.2s ease-out;
+  &:hover {
+    background-size: 105% 105% !important;
+  }
+}
+
+.rect-img-font {
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 48px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+}
+
+.messages {
+  overflow-y: scroll;
+  height: 205px;
+}
+
+.selected {
+  background-color: #00cfb4;
+  opacity: 70.1%;
+}
+
+.select2-container {
+  height: 65px;
+}
+
+.rect-button-confirm {
+  width: 100%;
+  height: 76px;
+  max-width: 182px;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 36px;
+  color: white;
+  background: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.2)
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
+  border: none;
+  border-radius: 16px;
+}
+
+.rect-button {
+  width: 100%;
+  height: 54px;
+  max-width: 290px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 100%;
+  color: white;
+  background: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.2)
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
+  border: none;
+  border-radius: 16px;
+}
+
+.messages {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 26px;
+  row-gap: 10px;
+}
+
+.custom-button {
+  max-width: 289px;
+  width: 100%;
+  height: 54px;
+  color: #00cfb4;
+  border-color: #00cfb4;
+  border-width: 4px;
+  border-radius: 16px;
+  justify-self: end;
+}

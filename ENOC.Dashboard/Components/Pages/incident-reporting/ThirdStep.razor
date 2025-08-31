@@ -1,0 +1,47 @@
+<div class="teams-message">
+        <div class="teams-section">
+            <h3 class="header-font">Team</h3>
+            <div class="teams">
+                <div  class="rect-img rect-img-custom" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%), url('/incident-steps-images/team-management.png');">
+                    <span class="rect-img-font">Management</span>
+                </div>
+    
+                <div class="rect-img rect-img-custom" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%), url('/incident-steps-images/team-eerc.png');">
+                    <span class="rect-img-font">EERC</span>
+                </div>
+            </div>
+        </div>
+        <div class="teams-section" style="flex-shrink: 2;">
+            <h3 class="header-font">Message</h3>
+           <div class="messages">
+            <div class="rect-button">
+                Message 1 content
+            </div>
+              <div class="rect-button">
+                Message 2 content
+            </div>
+              <div class="rect-button">
+                Message 3 content
+            </div>
+              <div class="rect-button">
+                Message 4 content
+            </div>
+              <div class="rect-button">
+                Message 5 content
+            </div>
+              <div class="rect-button">
+                Message 6 content
+            </div>
+           </div> 
+            <div style="display: flex; width: 100%; justify-content: end;">
+                    <button class="btn custom-button" data-bs-toggle="modal" data-bs-target="#AddCustomMessageModal" style="width: 100%;"><span class="rounded-blue-button-font">Custom message</span></button>
+            </div>
+        </div>
+    </div>
+
+            <button id="form-button" class="btn btn-secondary btn-aqua rect-button-confirm incident-form-button mt-2"  @onclick="onConfirm">Confirm</button>
+
+@code{
+    [Parameter]
+    public Func<Task> onConfirm {get; set;}
+}

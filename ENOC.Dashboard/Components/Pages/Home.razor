@@ -1,7 +1,82 @@
 ﻿@page "/"
+@using ENOC.Dashboard.Components.Layout
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Main Control & Mangement System</PageTitle>
 
-<h1>Hello, world!</h1>
+<HeaderNav Title="Main Control & Mangement System"/>
 
-Welcome to your new app.
+
+<img src="@Assets["assets/bg-banner.png"]" alt="Background Banner" style="position: absolute; bottom: -4px; right: -550px; width: 985px; height: auto; z-index: 0;">
+
+<div style="z-index: 1; position: relative; padding-inline: 30px; max-width: 1420px; margin-inline: auto;">
+<div class="row" style=" align-items: center; justify-content: center; padding-bottom: 60px;">
+    <div class="col-xl-3 col-md-4 col-sm-6">
+        <a href="/incident-reporting">
+            <div class="rect-img" style="background: linear-gradient(    180deg,    rgba(0, 0, 0, 0) 0%,    rgba(0, 0, 0, 0.6) 100%  ), url('dashboard-imgs/incident-alert.png');">
+                <div class="rect-img-blur">
+                    <span class="rect-img-font">Incident <br/> Alert</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-md-4 col-sm-6">
+        <a href="/staff-alert">
+            <div class="rect-img" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%), url('dashboard-imgs/staff-alert-commu.png');">
+                <div class="rect-img-blur">
+                    <span class="rect-img-font">Staff Alert <br/> Exercises</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-md-4 col-sm-6" style="@(!true ? "display: none;" : "")">
+        <a href="/reports-and-analysis">
+            <div class="rect-img" style="background: linear-gradient(    180deg,    rgba(0, 0, 0, 0) 0%,    rgba(0, 0, 0, 0.8) 100%  ), url('dashboard-imgs/reports-and-analysis.png');">
+                <div class="rect-img-blur">
+                    <span class="rect-img-font">Reports and <br/> Analysis</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-md-4 col-sm-6">
+        <a href="/structure-information-system/map-info">
+            <div class="rect-img" style="background: linear-gradient(    180deg,    rgba(0, 0, 0, 0) 0%,    rgba(0, 0, 0, 0.8) 100%  ), url('dashboard-imgs/structure-information-system.png');">
+                <div class="rect-img-blur">
+                    <span class="rect-img-font">Structure <br/>Information System</span>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+
+
+<div class="row mb-5" style="z-index: 200 !important; align-items: center; justify-content: center;">
+     <div class="col-xl-3 col-md-4 col-sm-6">
+        <a>
+            <div class="rect-img gray-img" style="background: linear-gradient(    180deg,    rgba(0, 0, 0, 0) 0%,    rgba(0, 0, 0, 0.8) 100%  ), url('dashboard-imgs/user-management.png'); background-size: 100% 100%;">
+                <div class="rect-img-blur">
+                    <span class="rect-img-font">User <br/> Management</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-md-4 col-sm-6">
+        <a href="/evidence-and-elaboration">
+            <div class="rect-img" style="background: linear-gradient(    180deg,    rgba(0, 0, 0, 0) 0%,    rgba(0, 0, 0, 0.8) 100%  ), url('dashboard-imgs/evidence-and-elaboration.png');">
+                <div class="rect-img-blur">
+                    <span class="rect-img-font">Evidence and<br/> Elaboration</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-xl-3 col-md-4 col-sm-6">
+        <a>
+            <div class="rect-img gray-img" style="background:linear-gradient(    180deg,    rgba(0, 0, 0, 0) 0%,    rgba(0, 0, 0, 0.8) 100%  ), url('dashboard-imgs/first-aid-info-system.png');">
+                <div class="rect-img-blur">
+                    <span class="rect-img-font">First Aid<br/> Information System</span>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+</div>
