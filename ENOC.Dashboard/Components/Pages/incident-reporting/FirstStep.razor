@@ -9,7 +9,7 @@
         @foreach (var incidentType in @IncidentTypes)
         {
             <div class="col-and-half">
-                <a href="#" class="incident-type" data-id="@incidentType.Id">
+                <a class="incident-type" data-id="@incidentType.Id">
                     <div class="rect-img" style="background:linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%), url('@incidentType.Image');">
                         <div class="rect-img-blur">
                             <span class="rect-img-font">@incidentType.Name</span>
