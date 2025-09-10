@@ -1,3 +1,12 @@
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2c3e50;
+  --accent-color: #e74c3c;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+  --success-color: #27ae60;
+}
+
 html,
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -10,9 +19,12 @@ body {
 a {
   text-decoration: none;
 }
+
+main {
+  overflow: hidden;
+}
 .page-header {
   height: 178px;
-  overflow: hidden;
   padding-inline: 30px;
   max-width: 1420px;
   margin-inline: auto;
@@ -25,10 +37,12 @@ a {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 178px);
-  overflow: hidden;
   padding-inline: 30px;
   max-width: 1420px;
   margin-inline: auto;
+}
+.page-container.bottom-drawer {
+  padding-bottom: 84px;
 }
 
 .height-container {

@@ -1,0 +1,119 @@
+@using ENOC.Dashboard.Components.Layout
+@page "/user-management"
+
+<PageTitle>Manage users</PageTitle>
+
+
+<HeaderNav Title="Manage users"/>
+<div class="page-container bottom-drawer">
+
+        <div class="add-user-button-container">
+            <button class="btn custom-button"> Add user</button>
+        </div>
+        <div class="user-management-container">
+        <div class="search-container">
+            <div class="search-box">
+ <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M20.9999 21L16.6499 16.65" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+                <input type="text" class="form-control" placeholder="Search">
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Full name</th>
+                        <th>Team</th>
+                        <th>Position</th>
+                        <th>Email</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Kelly J. Walker</td>
+                        <td><span class="team-badge badge-management">Management</span></td>
+                        <td>Station Fire Officer</td>
+                        <td>Kelly.J.Walker@gmail.com</td>
+                        <td class="action-buttons text-center">
+                       <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Alma Hryal Attia</td>
+                        <td><span class="team-badge badge-operation">Operation</span></td>
+                        <td>Station Fire Officer</td>
+                        <td>Alma.Hryal@gmail.com</td>
+                        <td class="action-buttons text-center">
+                            <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Ilisa Fadi Isaa</td>
+                        <td><span class="team-badge badge-black">Black team</span></td>
+                        <td>Fire truck operator</td>
+                        <td>Fadi.Isaa18@69.gmail.com</td>
+                        <td class="action-buttons text-center">
+                            <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Farraj Rdwar Kanaan</td>
+                        <td><span class="team-badge badge-green">Green team</span></td>
+                        <td>Fire truck operator</td>
+                        <td>RalfAbdul.MuhakRouzi@gmail.com</td>
+                        <td class="action-buttons text-center">
+                            <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <nav class="pagination-container">
+                <ul class="pagination">
+                    <li class="disabled page-button" style="margin-right:14px;"><div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 12H5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 19L5 12L12 5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></li>
+                    <li class="page-item active"><div>1</div></li>
+                    <li class="page-item"><div>2</div></li>
+                    <li class="page-item"><div>3</div></li>
+                     <li class="page-item"><div>3</div></li>
+                      <li class="page-item"><div>5</div></li>
+                         <li class="page-item"><div>...</div></li>
+                         <li class="page-item"><div>10</div></li>
+                    <li class="page-button" style="margin-left:14px;"><div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 5L19 12L12 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div></li>
+                </ul>
+        </nav>
+    </div>
+</div>
