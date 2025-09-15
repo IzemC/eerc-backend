@@ -1,0 +1,16 @@
+services:
+  enoc-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.API
+    ports:
+      - "8080:8080"
+
+  enoc-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.Dashboard
+    ports:
+      - "80:80"
+    depends_on:
+      - enoc-api
