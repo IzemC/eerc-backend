@@ -1,0 +1,273 @@
+@page "/structure-information-system/erg-info"
+@using ENOC.Dashboard.Components.Layout
+@rendermode InteractiveServer
+
+<PageTitle>Structure Information System</PageTitle>
+
+<HeaderNav Title="Structure Information System" />
+
+<HeadContent>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+</HeadContent>
+
+<div class="" style="max-width: 1340px; padding-inline: 16px; margin-inline: auto">
+@if (files?.Count > 0)
+{
+    <h4 class="files-title">Files:</h4>
+    <div class="row files-row">
+       @foreach (var file in files)
+{
+    <div class="col-xl-3 col-sm-3 col-xs-3">
+        <a href="@GetDownloadUrl(file.Id)">
+            <div class="container rect">
+                <img class="rect-icon" src="@(file.Type == FileType.PDF ? "/imgs/pdf.png" : "/imgs/pic.png")" />
+                <span class="rect-font">@((MarkupString)file.Name.Replace("\n", "<br />"))</span>
+            </div>
+        </a>
+    </div>
+}
+    </div>
+}
+
+<div class="row mt-4">
+    <div class="col-xl-12 col-sm-12 col-xs-12">
+        <a id="erg">
+            <div class="container long-rect">
+                <span class="long-rect-font">ERG: @ergNumber</span>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div class="container-fluid mt-5 mb-5 text-center" style="position: relative; height: 740px; padding: 0; z-index: 1;">
+    <div class="card small-card-1">
+        <div class="card-content">
+            <div class="card-body">
+                <h4 class="card-title">Temperature</h4>
+                <p class="card-text">
+                    <span id="temperature">@weather?.Temp1</span>
+                    <span>°F</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="card small-card-2">
+        <div class="card-content">
+            <div class="card-body">
+                <h4 class="card-title">Relative Humidity</h4>
+                <p class="card-text">
+                    <span id="relHumidity">@weather?.RelHumidity</span>
+                    <span>%</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card medium-card-2">
+        <div class="card-content">
+            <div class="card-body">
+                <h4 class="card-title">Temperature Variables</h4>
+                <p class="card-text">
+                    Heat index
+                    <span id="heatIndex">@weather?.HeatIndex</span>
+                    <span>°F</span>
+                </p>
+                <p class="card-text">
+                    Dew point
+                    <span id="dewPoint">@weather?.DewPoint</span>
+                    <span>°F</span>
+                </p>
+                <p class="card-text">
+                    Wind chill
+                    <span id="windChill">@weather?.WindChill</span>
+                    <span>°F</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card large-card">
+        <div class="card-content">
+            <div class="card-body">
+                <h4 class="card-title">Wind Direction</h4>
+                <div id="compass" data-value="@weather?.RawWindDir" style="min-width: 310px; max-width: 400px; height: 300px; margin: 0 auto"></div>
+                <p class="card-text">
+                    <span id="rawWindDir">@weather?.RawWindDir</span><span>°</span>/<span id="windSpeed">@weather?.WindSpeed</span><span> mph</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card medium-card-1">
+        <div class="card-content">
+            <div class="card-body">
+                <h4 class="card-title">Wind Averages</h4>
+                <p class="card-text">
+                    3 Seconds average
+                    <span id="3SecRollAvgWindSpeed">@weather?.ThreeSecRollAvgWindSpeed</span><span> mph</span>
+                    <span id="3SecRollAvgWindDir">@weather?.ThreeSecRollAvgWindDir</span><span>°</span>
+                </p>
+                <p class="card-text">
+                    2 Minutes average
+                    <span id="2MinRollAvgWindSpeed">@weather?.TwoMinRollAvgWindSpeed</span><span> mph</span>
+                    <span id="2MinRollAvgWindDir">@weather?.TwoMinRollAvgWindDir</span><span>°</span>
+                </p>
+                <p class="card-text">
+                    10 Minutes average
+                    <span id="10MinRollAvgWindSpeed">@weather?.TenMinRollAvgWindSpeed</span><span> mph</span>
+                    <span id="10MinRollAvgWindDir">@weather?.TenMinRollAvgWindDir</span><span>°</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card medium-card-3">
+        <div class="card-content">
+            <div class="card-body">
+                <h4 class="card-title">Wind Gusts</h4>
+                <p class="card-text">
+                    10 Minutes gust
+                    <span id="10MinWindGustSpeed">@weather?.TenMinWindGustSpeed</span><span> mph</span>
+                    <span id="10MinWindGustDir">@weather?.TenMinWindGustDir</span><span>°</span>
+                </p>
+                <p class="card-text">
+                    1 Hour average
+                    <span id="60MinWindGustSpeed">@weather?.SixtyMinWindGustSpeed</span><span> mph</span>
+                    <span id="60MinWindGustDir">@weather?.SixtyMinWindGustDir</span><span>°</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card medium-card-4">
+        <div class="card-content">
+            <div class="card-body">
+                <h4 class="card-title">Barometric Pressure</h4>
+                <p class="card-text">
+                    <span id="adjBaromPress">@weather?.AdjBaromPress</span>
+                    <span>in Hg</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card medium-card-5">
+        <div class="card-content">
+            <div class="card-body">
+                <h4 class="card-title">Solar Radiation</h4>
+                <p class="card-text">
+                    <span>Sensor 1</span>
+                    <span></span>
+                </p>
+                <p class="card-text">
+                    <span>Sensor 2</span>
+                    <span></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card medium-card-6">
+        <div class="card-content">
+            <div class="card-body">
+                <h4 class="card-title">Rain Today</h4>
+                <p class="card-text">
+                    <span id="rainToday">@weather?.RainToday</span>
+                    <span>in</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+    <script src="@Assets["js/erg-info.js"]"></script>
+@code {
+    private List<FileInfo> files = new();
+    private string ergNumber = "1203";
+    private WeatherInfo weather = new();
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+        // Mock data - replace with API calls
+        files = new List<FileInfo>
+        {
+            new FileInfo { Id = 1, Name = "Business unit level drawings", Type = FileType.PDF },
+            new FileInfo { Id = 2, Name = "Equipment level drawings", Type = FileType.Image },
+            new FileInfo { Id = 3, Name = "Tank datasheet information", Type = FileType.PDF },
+             new FileInfo { Id = 4, Name = "Tank level \ndrawings", Type = FileType.PDF }
+        };
+
+        weather = new WeatherInfo
+        {
+            Temp1 = 75.5m,
+            RelHumidity = 65,
+            HeatIndex = 78.2m,
+            DewPoint = 62.1m,
+            WindChill = 73.8m,
+            RawWindDir = 180,
+            WindSpeed = 12.5m,
+            ThreeSecRollAvgWindSpeed = 12.3m,
+            ThreeSecRollAvgWindDir = 182,
+            TwoMinRollAvgWindSpeed = 11.8m,
+            TwoMinRollAvgWindDir = 178,
+            TenMinRollAvgWindSpeed = 11.5m,
+            TenMinRollAvgWindDir = 175,
+            TenMinWindGustSpeed = 15.2m,
+            TenMinWindGustDir = 185,
+            SixtyMinWindGustSpeed = 16.8m,
+            SixtyMinWindGustDir = 190,
+            AdjBaromPress = 29.92m,
+            RainToday = 0.15m
+        };
+    }
+
+    private string GetDownloadUrl(int fileId)
+    {
+        // Implement download URL generation
+        @* return $"/api/download/{fileId}"; *@
+        return null;
+    }
+
+    public class FileInfo
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public FileType Type { get; set; }
+    }
+
+    public enum FileType
+    {
+        PDF,
+        Image
+    }
+
+    public class WeatherInfo
+    {
+        public decimal Temp1 { get; set; }
+        public int RelHumidity { get; set; }
+        public decimal HeatIndex { get; set; }
+        public decimal DewPoint { get; set; }
+        public decimal WindChill { get; set; }
+        public int RawWindDir { get; set; }
+        public decimal WindSpeed { get; set; }
+        public decimal ThreeSecRollAvgWindSpeed { get; set; }
+        public int ThreeSecRollAvgWindDir { get; set; }
+        public decimal TwoMinRollAvgWindSpeed { get; set; }
+        public int TwoMinRollAvgWindDir { get; set; }
+        public decimal TenMinRollAvgWindSpeed { get; set; }
+        public int TenMinRollAvgWindDir { get; set; }
+        public decimal TenMinWindGustSpeed { get; set; }
+        public int TenMinWindGustDir { get; set; }
+        public decimal SixtyMinWindGustSpeed { get; set; }
+        public int SixtyMinWindGustDir { get; set; }
+        public decimal AdjBaromPress { get; set; }
+        public decimal RainToday { get; set; }
+    }
+}

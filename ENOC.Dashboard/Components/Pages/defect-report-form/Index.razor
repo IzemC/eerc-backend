@@ -1,0 +1,119 @@
+@page "/defects-report-form"
+@using ENOC.Dashboard.Components.Layout
+@rendermode InteractiveServer
+
+<PageTitle>Defects Report Form</PageTitle>
+
+<HeaderNav Title="Defects Report Form" />
+
+<div class="row mb-3">
+    <div class="col-xl-12 col-sm-12 col-xs-12 text-center">
+        <h4 class="date-font">@currentDate.ToString("dddd, MMMM dd, yyyy")</h4>
+    </div>
+</div>
+
+<div class="row center-row mb-5">
+    <div class="col-xl-2 col-md-2 col-sm-2 col-xs-2 text-center">
+        <button class="arrow hvr-bob" style="cursor: pointer; border: none; background: none;" @onclick="NavigateLeft">
+            <img src="imgs/left-arrow.png" />
+        </button>
+    </div>
+    <div class="col-xl-8 col-md-8 col-sm-8 col-xs-8 list">
+        @if (defectReports.Any())
+        {
+            @foreach (var report in currentReports)
+            {
+                <a>
+                    <div class="rect-background">
+                        <div class="rect">
+                            <span class="rect-font">@report.Name</span>
+                            <span class="rect-font-sm">@report.Details</span>
+                        </div>
+                    </div>
+                </a>
+            }
+        }
+        else
+        {
+            <a>
+                <div class="rect-background">
+                    <div class="rect">
+                        <span class="rect-font">No defect reports</span>
+                        <span class="rect-font-sm">No reports available for this date</span>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+    <div class="col-xl-2 col-md-2 col-sm-2 col-xs-2 text-center">
+        <button class="arrow hvr-bob" style="cursor: pointer; border: none; background: none;" @onclick="NavigateRight">
+            <img src="imgs/right-arrow.png" />
+        </button>
+    </div>
+</div>
+
+@code {
+    private List<DefectReport> defectReports = new();
+    private List<DefectReport> currentReports = new();
+    private DateTime currentDate = DateTime.Today;
+    private int currentPage = 0;
+    private const int reportsPerPage = 3;
+
+    protected override void OnInitialized()
+    {
+        LoadDefectReports();
+        UpdateDisplayedReports();
+    }
+
+    private void LoadDefectReports()
+    {
+        // Same data as Crew Vehicle Listing
+        defectReports = new List<DefectReport>
+        {
+            new DefectReport { Name = "Shift 1", Details = "From 8:00 AM to 10:00 AM" },
+            new DefectReport { Name = "Shift 2", Details = "From 10:00 AM to 12:00 PM" },
+            new DefectReport { Name = "Shift 3", Details = "From 12:00 PM to 8:00 AM" },
+            new DefectReport { Name = "Shift 4", Details = "From 8:00 AM to 10:00 AM" },
+            new DefectReport { Name = "Shift 5", Details = "From 10:00 AM to 12:00 PM" },
+            new DefectReport { Name = "Shift 6", Details = "From 12:00 PM to 8:00 AM" },
+            new DefectReport { Name = "Shift 7", Details = "From 8:00 AM to 10:00 AM" },
+            new DefectReport { Name = "Shift 8", Details = "From 10:00 AM to 12:00 PM" },
+            new DefectReport { Name = "Shift 9", Details = "From 12:00 PM to 8:00 AM" }
+        };
+    }
+
+    private void UpdateDisplayedReports()
+    {
+        var startIndex = currentPage * reportsPerPage;
+        currentReports = defectReports.Skip(startIndex).Take(reportsPerPage).ToList();
+    }
+
+    private void NavigateLeft()
+    {
+        if (currentPage > 0)
+        {
+            currentPage--;
+            currentDate = currentDate.AddDays(-1);
+            UpdateDisplayedReports();
+            StateHasChanged();
+        }
+    }
+
+    private void NavigateRight()
+    {
+        var maxPage = (int)Math.Ceiling((double)defectReports.Count / reportsPerPage) - 1;
+        if (currentPage < maxPage)
+        {
+            currentPage++;
+            currentDate = currentDate.AddDays(1);
+            UpdateDisplayedReports();
+            StateHasChanged();
+        }
+    }
+
+    public class DefectReport
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Details { get; set; } = string.Empty;
+    }
+}

@@ -1,0 +1,77 @@
+@page "/evidence-and-elaboration"
+@using ENOC.Dashboard.Components.Layout
+
+@rendermode InteractiveServer
+
+<PageTitle>Evidence and Elaboration</PageTitle>
+
+<HeaderNav Title="Evidence and Elaboration" />
+
+<div class="d-grid gallery mb-5 mx-auto" style="max-width: 1180px; grid-template-columns: repeat(2, 1fr);">
+    @foreach (var video in videos)
+    {
+        <div>
+            <button @onclick="() => ShowVideo(video.Id)" style="border: none; background: none;">
+                <img class="w-100 shadow-1-strong rounded mb-4 video" src="@video.Thumbnail" alt="Video thumbnail">
+            </button>
+        </div>
+    }
+</div>
+
+@if (showVideoModal)
+{
+    <div class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Video Player</h5>
+                    <button type="button" class="btn-close" @onclick="CloseVideo"></button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="youTubeVideo" width="100%" height="400" src="@videoSrc" 
+                            frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Video> videos = new();
+    private bool showVideoModal = false;
+    private string videoSrc = "";
+    
+    protected override void OnInitialized()
+    {
+        videos = new List<Video>
+        {
+            new Video { Id = "video1", Thumbnail = "/assets/yt-thumb-placeholder.png" },    
+            new Video { Id = "video2", Thumbnail = "/assets/yt-thumb-placeholder.png" },
+            new Video { Id = "video3", Thumbnail = "/assets/yt-thumb-placeholder.png" },
+            new Video { Id = "video4", Thumbnail = "/assets/yt-thumb-placeholder.png" },
+            @* new Video { Id = "video5", Thumbnail = "/assets/yt-thumb-placeholder.png" },
+            new Video { Id = "video6", Thumbnail = "/assets/yt-thumb-placeholder.png" } *@
+        };
+    }
+
+    private void ShowVideo(string videoId)
+    {
+        videoSrc = $"https://www.youtube.com/embed/{videoId}?autoplay=1&controls=0";
+        showVideoModal = true;
+        StateHasChanged();
+    }
+
+    private void CloseVideo()
+    {
+        showVideoModal = false;
+        videoSrc = "";
+        StateHasChanged();
+    }
+
+    public class Video
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Thumbnail { get; set; } = string.Empty;
+    }
+}

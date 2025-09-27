@@ -1,12 +1,3 @@
-:root {
-  --primary-color: #3498db;
-  --secondary-color: #2c3e50;
-  --accent-color: #e74c3c;
-  --light-color: #f8f9fa;
-  --dark-color: #343a40;
-  --success-color: #27ae60;
-}
-
 html,
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -136,4 +127,30 @@ h1:focus {
     linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
   border: none;
   border-radius: 16px;
+}
+
+.search-box {
+  position: relative;
+  max-width: 400px;
+  input {
+    height: 44px;
+    font-size: 14px;
+    border: none;
+    border-radius: 71px;
+    background: #ffffff40;
+    color: white;
+    padding-left: 18px;
+    &::placeholder {
+      color: #d4d2d2;
+    }
+  }
+  svg {
+    position: absolute;
+    right: 15px;
+    width: 24px;
+    height: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #d4d2d2;
+  }
 }

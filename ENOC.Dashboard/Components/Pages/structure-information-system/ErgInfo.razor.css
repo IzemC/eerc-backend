@@ -1,0 +1,200 @@
+.rect {
+  position: relative;
+  width: 100%;
+  left: -0.25%;
+  right: 0.13%;
+  top: 0%;
+  bottom: 0%;
+  border-radius: 16px;
+  background: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.2)
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
+}
+
+.rect:before {
+  content: "";
+  display: block;
+  padding-top: 45%;
+}
+
+.rect-font {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 1.7rem;
+  line-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #ffffff;
+  padding-bottom: 1rem;
+}
+
+.rect-icon {
+  position: absolute;
+  left: 41.21%;
+  right: 41.53%;
+  top: 8.04%;
+}
+
+.long-rect {
+  position: relative;
+  left: -0.18%;
+  right: 0.06%;
+  top: 0%;
+  bottom: 0%;
+  border-radius: 16px;
+  background: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.2)
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
+}
+
+.long-rect:before {
+  content: "";
+  display: block;
+  padding-top: 8%;
+}
+
+.long-rect-font {
+  position: absolute;
+  left: 37.62%;
+  right: 39.54%;
+  top: 34.67%;
+  bottom: 34.67%;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 50px;
+  line-height: 61px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.small-card-1 {
+  width: 15.5%;
+  height: 9.375rem;
+  position: absolute;
+}
+
+.small-card-2 {
+  width: 15.5%;
+  height: 9.375rem;
+  position: absolute;
+  left: 16%;
+}
+
+.large-card {
+  width: 32%;
+  height: 23.563rem;
+  position: absolute;
+  left: 33.5%;
+}
+
+.medium-card-1 {
+  width: 32%;
+  height: 12.625rem;
+  position: absolute;
+  left: 68%;
+}
+
+.medium-card-2 {
+  width: 31.5%;
+  height: 12.625rem;
+  position: absolute;
+  top: 23%;
+}
+
+.medium-card-3 {
+  width: 32%;
+  height: 9.375rem;
+  position: absolute;
+  left: 68%;
+  top: 30.5%;
+}
+
+.medium-card-4 {
+  width: 31.5%;
+  height: 9.375rem;
+  position: absolute;
+  top: 53.5%;
+}
+
+.medium-card-5 {
+  width: 32%;
+  height: 9.375rem;
+  position: absolute;
+  left: 33.5%;
+  top: 53.5%;
+}
+
+.medium-card-6 {
+  width: 32%;
+  height: 9.375rem;
+  position: absolute;
+  left: 68%;
+  top: 53.5%;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.2),
+      rgba(255, 255, 255, 0.2)
+    ),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%);
+}
+
+.card-title {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 25px !important;
+  line-height: 120%;
+  /* identical to box height, or 34px */
+  color: #ffffff;
+  text-shadow: -1.51px 2.26px 0.75px rgba(0, 0, 0, 0.1);
+}
+
+.card-text {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 19px !important;
+  line-height: 120%;
+  /* or 23px */
+  text-align: center;
+  color: #ffffff;
+  text-shadow: -1.51px 2.26px 0.75px rgba(0, 0, 0, 0.1);
+}
+
+.card-text span {
+  font-weight: 400;
+}
+
+.files-row {
+  align-items: start;
+  justify-content: start;
+}
+
+#erg {
+  cursor: pointer;
+}
+
+.files-title {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 24px;
+  line-height: 34px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 1px;
+  color: #ffffff;
+}

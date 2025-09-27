@@ -1,0 +1,159 @@
+@page "/structure-information-system/map-info"
+@using ENOC.Dashboard.Components.Layout
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Structure Information System</PageTitle>
+
+<HeaderNav Title="Structure Information System" />
+
+ @* <HeadContent>
+ <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBxks0RKxKU4d1OpsORR3kDXY51vyKGjIA&callback=initMap&libraries=&v=weekly" async></script>
+</HeadContent> *@
+
+<div class="row">
+    <div style="margin-left: 43px;">
+        <div class="form-group">
+                <div class="search-container">
+            <div class="search-box">
+ <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M20.9999 21L16.6499 16.65" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+                <input @bind="searchText" @bind:event="oninput" type="text" class="form-control" placeholder="Search">
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<!--Google map-->
+@* <div id="map" style="height: 600px; width: 100%;"></div> *@
+<a href="/structure-information-system/erg-info">
+<img src="@Assets["assets/map-placeholder.png"]" alt="" class="img-fluid w-full mt-3 d-flex m-auto">
+</a>
+
+@if (showTankForm)
+{
+    <div class="modal fade show" style="display: block; background: rgba(0,0,0,0.5);" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tank Information</h5>
+                    <button type="button" class="btn-close" @onclick="CloseTankForm"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <input type="hidden" @bind="selectedTankId" />
+                        <div class="form-group">
+                            <label for="tankName">Tank Name</label>
+                            <input type="text" class="form-control" @bind="selectedTankName" />
+                        </div>
+                        <button type="button" class="btn btn-primary mt-3" @onclick="SaveTank">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string searchText = "";
+    private bool showTankForm = false;
+    private string selectedTankId = "";
+    private string selectedTankName = "";
+    
+    // Mock data - replace with actual API calls
+    private List<MapPolygon> polygons = new();
+    private List<MapMarker> markers = new();
+    private MapLocation location = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadMapData();
+            await InitializeMap();
+        }
+    }
+
+    private async Task LoadMapData()
+    {
+        // Mock data - replace with API calls
+        polygons = new List<MapPolygon>
+        {
+            new MapPolygon { Points = "points1", TankId = "tank1", TankName = "Tank A" },
+            new MapPolygon { Points = "points2", TankId = "tank2", TankName = "Tank B" }
+        };
+
+        markers = new List<MapMarker>
+        {
+            new MapMarker { Lat = 25.2048, Lng = 55.2708, Title = "Marker 1" },
+            new MapMarker { Lat = 25.2058, Lng = 55.2718, Title = "Marker 2" }
+        };
+
+        location = new MapLocation { Lat = 25.2048, Lng = 55.2708, Zoom = 12 };
+    }
+
+    private async Task InitializeMap()
+    {
+        @* await JSRuntime.InvokeVoidAsync("initMap", polygons, markers, location); *@
+    }
+
+    private void HandleSearch()
+    {
+        // Implement search functionality
+        Console.WriteLine($"Searching for: {searchText}");
+    }
+
+    private void ShowTankDetails(string tankId)
+    {
+        var tank = polygons.FirstOrDefault(p => p.TankId == tankId);
+        if (tank != null)
+        {
+            selectedTankId = tank.TankId;
+            selectedTankName = tank.TankName;
+            showTankForm = true;
+            StateHasChanged();
+        }
+    }
+
+    private void CloseTankForm()
+    {
+        showTankForm = false;
+        selectedTankId = "";
+        selectedTankName = "";
+        StateHasChanged();
+    }
+
+    private async Task SaveTank()
+    {
+        // Implement save functionality
+        Console.WriteLine($"Saving tank: {selectedTankName}");
+        showTankForm = false;
+        StateHasChanged();
+    }
+
+    // Data classes
+    public class MapPolygon
+    {
+        public string Points { get; set; } = "";
+        public string TankId { get; set; } = "";
+        public string TankName { get; set; } = "";
+    }
+
+    public class MapMarker
+    {
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+        public string Title { get; set; } = "";
+    }
+
+    public class MapLocation
+    {
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+        public int Zoom { get; set; } = 10;
+    }
+}

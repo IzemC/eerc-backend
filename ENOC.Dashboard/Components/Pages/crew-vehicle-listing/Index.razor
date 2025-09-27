@@ -1,0 +1,120 @@
+@page "/crew-vehicle-listing"
+@using ENOC.Dashboard.Components.Layout
+
+@rendermode InteractiveServer
+
+<PageTitle>Crew Vehicle Listing</PageTitle>
+
+<HeaderNav Title="Crew Vehicle Listing" />
+
+
+<div class="row mb-3">
+    <div class="col-xl-12 col-sm-12 col-xs-12 text-center">
+        <h4 class="date-font">@currentDate.ToString("dddd, MMMM dd, yyyy")</h4>
+    </div>
+</div>
+
+<div class="row center-row mb-5">
+    <div class="col-xl-2 col-md-2 col-sm-2 col-xs-2 text-center">
+        <button class="arrow hvr-bob" style="cursor: pointer; border: none; background: none;" @onclick="NavigateLeft">
+            <img src="imgs/left-arrow.png" />
+        </button>
+    </div>
+    <div class="col-8 col-xl-8 col-md-8 col-sm-8 col-xs-8 list">
+        @if (currentVehicles.Any())
+        {
+            @foreach (var vehicle in currentVehicles)
+            {
+                <a>
+                    <div class="rect-color rect-background">
+                        <div class="rect">
+                            <span class="rect-font">@vehicle.Name</span>
+                            <span class="rect-font-sm">@vehicle.Details</span>
+                        </div>
+                    </div>
+                </a>
+            }
+        }
+        else
+        {
+            <a>
+                <div class="rect-color rect-background">
+                    <div class="rect">
+                        <span class="rect-font">No vehicles available</span>
+                        <span class="rect-font-sm">Please check back later</span>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+    <div class="col-xl-2 col-md-2 col-sm-2 col-xs-2 text-center">
+        <button @onclick="NavigateRight" class="arrow hvr-bob" style="cursor: pointer; border: none; background: none;">  
+            <img src="imgs/right-arrow.png" />
+        </button>
+    </div>
+</div>
+
+@code {
+    private List<CrewVehicle> allVehicles = new();
+    private List<CrewVehicle> currentVehicles = new();
+    private DateTime currentDate = DateTime.Today;
+    private int currentPage = 0;
+    private const int vehiclesPerPage = 3;
+
+    protected override void OnInitialized()
+    {
+        LoadCrewVehicles();
+        UpdateDisplayedVehicles();
+    }
+
+    private void LoadCrewVehicles()
+    {
+        allVehicles = new List<CrewVehicle>
+        {
+            new CrewVehicle { Name = "Shift 1", Details = "From 8:00 AM to 10:00 AM" },
+            new CrewVehicle { Name = "Shift 2", Details = "From 10:00 AM to 12:00 PM" },
+            new CrewVehicle { Name = "Shift 3", Details = "From 12:00 PM to 8:00 AM" },
+            new CrewVehicle { Name = "Shift 4", Details = "From 8:00 AM to 10:00 AM" },
+            new CrewVehicle { Name = "Shift 5", Details = "From 10:00 AM to 12:00 PM" },
+            new CrewVehicle { Name = "Shift 6", Details = "From 12:00 PM to 8:00 AM" },
+            new CrewVehicle { Name = "Shift 7", Details = "From 8:00 AM to 10:00 AM" },
+            new CrewVehicle { Name = "Shift 8", Details = "From 10:00 AM to 12:00 PM" },
+            new CrewVehicle { Name = "Shift 9", Details = "From 12:00 PM to 8:00 AM" }
+        };
+    }
+
+    private void UpdateDisplayedVehicles()
+    {
+        var startIndex = currentPage * vehiclesPerPage;
+        currentVehicles = allVehicles.Skip(startIndex).Take(vehiclesPerPage).ToList();
+    }
+
+    private void NavigateLeft()
+    {
+        if (currentPage > 0)
+        {
+            currentPage--;
+            currentDate = currentDate.AddDays(-1);
+            UpdateDisplayedVehicles();
+            StateHasChanged();
+        }
+    }
+
+    private void NavigateRight()
+    {
+        var maxPage = (int)Math.Ceiling((double)allVehicles.Count / vehiclesPerPage) - 1;
+        if (currentPage < maxPage)
+        {
+            currentPage++;
+            currentDate = currentDate.AddDays(1);
+            UpdateDisplayedVehicles();
+            StateHasChanged();
+        }
+    }
+
+    public class CrewVehicle
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Details { get; set; } = string.Empty;
+    }
+}

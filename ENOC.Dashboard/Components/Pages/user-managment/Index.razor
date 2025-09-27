@@ -1,24 +1,26 @@
 @using ENOC.Dashboard.Components.Layout
 @page "/user-management"
 
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+
 <PageTitle>Manage users</PageTitle>
 
+<HeaderNav Title="Manage users" />
 
-<HeaderNav Title="Manage users"/>
 <div class="page-container bottom-drawer">
+    <div class="add-user-button-container">
+        <button class="btn custom-button" @onclick="ShowAddModal">Add User</button>
+    </div>
 
-        <div class="add-user-button-container">
-            <button class="btn custom-button"> Add user</button>
-        </div>
-        <div class="user-management-container">
+    <div class="user-management-container">
         <div class="search-container">
             <div class="search-box">
- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M20.9999 21L16.6499 16.65" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-
-                <input type="text" class="form-control" placeholder="Search">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M20.9999 21L16.6499 16.65" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="text" class="form-control" placeholder="Search" @bind="searchTerm" @oninput="OnSearch" />
             </div>
         </div>
         
@@ -26,94 +28,311 @@
             <table class="user-table">
                 <thead>
                     <tr>
-                        <th>Full name</th>
-                        <th>Team</th>
-                        <th>Position</th>
-                        <th>Email</th>
+                        @foreach (var column in tableColumns)
+                        {
+                            <th>@column.DisplayName</th>
+                        }
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Kelly J. Walker</td>
-                        <td><span class="team-badge badge-management">Management</span></td>
-                        <td>Station Fire Officer</td>
-                        <td>Kelly.J.Walker@gmail.com</td>
-                        <td class="action-buttons text-center">
-                       <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Alma Hryal Attia</td>
-                        <td><span class="team-badge badge-operation">Operation</span></td>
-                        <td>Station Fire Officer</td>
-                        <td>Alma.Hryal@gmail.com</td>
-                        <td class="action-buttons text-center">
-                            <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Ilisa Fadi Isaa</td>
-                        <td><span class="team-badge badge-black">Black team</span></td>
-                        <td>Fire truck operator</td>
-                        <td>Fadi.Isaa18@69.gmail.com</td>
-                        <td class="action-buttons text-center">
-                            <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Farraj Rdwar Kanaan</td>
-                        <td><span class="team-badge badge-green">Green team</span></td>
-                        <td>Fire truck operator</td>
-                        <td>RalfAbdul.MuhakRouzi@gmail.com</td>
-                        <td class="action-buttons text-center">
-                            <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</button>
-                        </td>
-                    </tr>
+                    @if (currentPageUsers.Any())
+                    {
+                        @foreach (var user in currentPageUsers)
+                        {
+                            <tr>
+                                <td>@user.FullName</td>
+                                <td><span class="@GetTeamBadgeClass(user.Team)">@user.Team</span></td>
+                                <td>@user.Position</td>
+                                <td>@user.Email</td>
+                                <td class="action-buttons text-center">
+                                    <div class="dropdown">
+                                        <button class="btn button-more" @onclick="() => ToggleActionMenu(user.Id)">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                        @if (activeActionMenu == user.Id)
+                                        {
+                                            <div class="action-menu show">
+                                                <button class="action-item" @onclick="() => EditUser(user)">Edit</button>
+                                                <button class="action-item delete" @onclick="() => DeleteUser(user.Id)">Delete</button>
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">No users found</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
         
         <nav class="pagination-container">
-                <ul class="pagination">
-                    <li class="disabled page-button" style="margin-right:14px;"><div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M19 12H5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M12 19L5 12L12 5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</div></li>
-                    <li class="page-item active"><div>1</div></li>
-                    <li class="page-item"><div>2</div></li>
-                    <li class="page-item"><div>3</div></li>
-                     <li class="page-item"><div>3</div></li>
-                      <li class="page-item"><div>5</div></li>
-                         <li class="page-item"><div>...</div></li>
-                         <li class="page-item"><div>10</div></li>
-                    <li class="page-button" style="margin-left:14px;"><div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M12 5L19 12L12 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</div></li>
-                </ul>
+            <ul class="pagination">
+                <li class="page-button @(currentPage == 1 ? "disabled" : "")" @onclick="GoToPreviousPage">
+                    <div>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 12H5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 19L5 12L12 5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </li>
+                
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    if (i <= 3 || i > totalPages - 2 || Math.Abs(i - currentPage) <= 1)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")" @onclick="() => GoToPage(i)">
+                            <div>@i</div>
+                        </li>
+                    }
+                    else if (i == 4 && currentPage < totalPages - 2)
+                    {
+                        <li class="page-item"><div>...</div></li>
+                    }
+                }
+                
+                <li class="page-button @(currentPage == totalPages ? "disabled" : "")" @onclick="GoToNextPage">
+                    <div>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 5L19 12L12 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </li>
+            </ul>
         </nav>
     </div>
 </div>
+
+@if (showModal)
+{
+    <div class="modal-backdrop show" @onclick="CloseModal"></div>
+    <div class="modal show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: #0C2340;">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(isEditing ? "Edit User" : "Add User")</h5>
+               
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseModal"></button>
+     
+                </div>
+                <div class="modal-body">
+                    <div class="form-group search-box">
+                        <input type="text" class="form-control" placeholder="Full Name" @bind="currentUser.FullName" />
+                    </div>
+                    <div class="form-group search-box">
+                        <input type="text" class="form-control" placeholder="Team" @bind="currentUser.Team" />
+                    </div>
+                    <div class="form-group search-box">
+                        <input type="text" class="form-control" placeholder="Position" @bind="currentUser.Position" />
+                    </div>
+                    <div class="form-group search-box">
+                        <input type="email" class="form-control" placeholder="Email" @bind="currentUser.Email" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn custom-button" @onclick="SaveUser">@(isEditing ? "Update" : "Send Invitation")</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<User> users = new();
+    private List<User> filteredUsers = new();
+    private List<User> currentPageUsers = new();
+    private User currentUser = new();
+    private string searchTerm = string.Empty;
+    private bool showModal = false;
+    private bool isEditing = false;
+    private int activeActionMenu = 0;
+    private int currentPage = 1;
+    private int pageSize = 4;
+    private int totalPages = 1;
+
+    private List<TableColumn> tableColumns = new()
+    {
+        new TableColumn { DisplayName = "Full name", PropertyName = "FullName" },
+        new TableColumn { DisplayName = "Team", PropertyName = "Team" },
+        new TableColumn { DisplayName = "Position", PropertyName = "Position" },
+        new TableColumn { DisplayName = "Email", PropertyName = "Email" }
+    };
+
+    protected override void OnInitialized()
+    {
+        LoadMockUsers();
+        ApplyFiltering();
+    }
+
+    private void LoadMockUsers()
+    {
+        users = new List<User>
+        {
+            new User { Id = 1, FullName = "Kelly J. Walker", Team = "Management", Position = "Station Fire Officer", Email = "Kelly.J.Walker@gmail.com" },
+            new User { Id = 2, FullName = "Alma Hryal Attia", Team = "Operation", Position = "Station Fire Officer", Email = "Alma.Hryal@gmail.com" },
+            new User { Id = 3, FullName = "Ilisa Fadi Isaa", Team = "Black team", Position = "Fire truck operator", Email = "Fadi.Isaa18@gmail.com" },
+            new User { Id = 4, FullName = "Farraj Rdwar Kanaan", Team = "Green team", Position = "Fire truck operator", Email = "RalfAbdul.MuhakRouzi@gmail.com" },
+            new User { Id = 5, FullName = "John Doe", Team = "Management", Position = "Team Lead", Email = "john.doe@gmail.com" },
+            new User { Id = 6, FullName = "Jane Smith", Team = "Operation", Position = "Operator", Email = "jane.smith@gmail.com" }
+        };
+    }
+
+    private void ApplyFiltering()
+    {
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            filteredUsers = users;
+        }
+        else
+        {
+            filteredUsers = users.Where(u =>
+                u.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                u.Team.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                u.Position.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                u.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+        currentPage = 1;
+        UpdatePagination();
+    }
+
+    private void UpdatePagination()
+    {
+        totalPages = (int)Math.Ceiling((double)filteredUsers.Count / pageSize);
+        currentPageUsers = filteredUsers.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+    }
+
+    private void OnSearch(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? "";
+        ApplyFiltering();
+    }
+
+    private void ShowAddModal()
+    {
+        currentUser = new User();
+        isEditing = false;
+        showModal = true;
+        StateHasChanged();
+    }
+
+    private void EditUser(User user)
+    {
+        currentUser = new User
+        {
+            Id = user.Id,
+            FullName = user.FullName,
+            Team = user.Team,
+            Position = user.Position,
+            Email = user.Email
+        };
+        isEditing = true;
+        showModal = true;
+        activeActionMenu = 0;
+        StateHasChanged();
+    }
+
+    private async Task DeleteUser(int userId)
+    {
+        if (await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this user?"))
+        {
+            users.RemoveAll(u => u.Id == userId);
+            ApplyFiltering();
+            StateHasChanged();
+        }
+        activeActionMenu = 0;
+    }
+
+    private void SaveUser()
+    {
+        if (isEditing)
+        {
+            var existingUser = users.FirstOrDefault(u => u.Id == currentUser.Id);
+            if (existingUser != null)
+            {
+                existingUser.FullName = currentUser.FullName;
+                existingUser.Team = currentUser.Team;
+                existingUser.Position = currentUser.Position;
+                existingUser.Email = currentUser.Email;
+            }
+        }
+        else
+        {
+            currentUser.Id = users.Count > 0 ? users.Max(u => u.Id) + 1 : 1;
+            users.Add(currentUser);
+        }
+        
+        ApplyFiltering();
+        CloseModal();
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+        StateHasChanged();
+    }
+
+    private void ToggleActionMenu(int userId)
+    {
+        activeActionMenu = activeActionMenu == userId ? 0 : userId;
+        StateHasChanged();
+    }
+
+    private void GoToPage(int page)
+    {
+        if (page >= 1 && page <= totalPages)
+        {
+            currentPage = page;
+            UpdatePagination();
+            StateHasChanged();
+        }
+    }
+
+    private void GoToPreviousPage()
+    {
+        if (currentPage > 1) GoToPage(currentPage - 1);
+    }
+
+    private void GoToNextPage()
+    {
+        if (currentPage < totalPages) GoToPage(currentPage + 1);
+    }
+
+    private string GetTeamBadgeClass(string team)
+    {
+        return team.ToLower() switch
+        {
+            "management" => "team-badge badge-management",
+            "operation" => "team-badge badge-operation", 
+            "black team" => "team-badge badge-black",
+            "green team" => "team-badge badge-green",
+            _ => "team-badge badge-default"
+        };
+    }
+
+    public class User
+    {
+        public int Id { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string Team { get; set; } = string.Empty;
+        public string Position { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+    }
+
+    public class TableColumn
+    {
+        public string DisplayName { get; set; } = string.Empty;
+        public string PropertyName { get; set; } = string.Empty;
+    }
+}
