@@ -16,6 +16,32 @@
   padding: 20px 24px;
 }
 
+.search-box {
+  position: relative;
+  max-width: 400px;
+  input {
+    height: 44px;
+    font-size: 14px;
+    border: none;
+    border-radius: 71px;
+    background: #ffffff40;
+    color: white;
+    padding-left: 18px;
+    &::placeholder {
+      color: #d4d2d2;
+    }
+  }
+  svg {
+    position: absolute;
+    right: 15px;
+    width: 24px;
+    height: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #d4d2d2;
+  }
+}
+
 .user-table {
   width: 100%;
   margin-bottom: 0;

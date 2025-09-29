@@ -23,7 +23,7 @@
         {
             @foreach (var report in currentReports)
             {
-                <a>
+               <a href="/defects-report-form/file">
                     <div class="rect-background">
                         <div class="rect">
                             <span class="rect-font">@report.Name</span>
@@ -51,6 +51,8 @@
         </button>
     </div>
 </div>
+
+<FooterNav/>
 
 @code {
     private List<DefectReport> defectReports = new();

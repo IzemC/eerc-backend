@@ -1,3 +1,6 @@
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
 @{
     string logoStyle = "";
     bool isLogin = false; 
@@ -21,10 +24,63 @@
         <div style="text-align: center; font-size: 36px; font-weight: 700; font-family:Inter; color: white; text-transform: uppercase;">
             @Title
         </div>
+        
+        @if (!isLogin)
+        {
+            <div class="header-actions">
+                @if (ChildContent != null)
+                {
+                    @ChildContent
+                }
+                else
+                {
+                    <div class="dropdown">
+                        <button class="btn hamburger-menu" @onclick="ToggleMenu">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 12H21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M3 6H21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M3 18H21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        @if (showMenu)
+                        {
+                            <div class="action-menu show" style="right: 0; left: auto;">
+                                <button class="action-item" @onclick="NavigateToTanksManagement">Manage Tanks</button>
+                                <button class="action-item" @onclick="HandleLogout">Logout</button>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
     </header>
 </div>
 
 @code {
     [Parameter]
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private bool showMenu = false;
+
+    private void ToggleMenu()
+    {
+        showMenu = !showMenu;
+    }
+
+    private void NavigateToTanksManagement()
+    {
+        NavigationManager.NavigateTo("/tanks-management");
+        showMenu = false;
+    }
+
+    private void HandleLogout()
+    {
+
+        showMenu = false;
+        
+        Console.WriteLine("Logout clicked - authentication not implemented yet");
+    }
 }

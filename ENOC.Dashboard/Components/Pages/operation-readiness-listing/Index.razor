@@ -1,11 +1,11 @@
-@page "/crew-vehicle-listing"
+@page "/operation-readiness-listing"
 @using ENOC.Dashboard.Components.Layout
 
 @rendermode InteractiveServer
 
-<PageTitle>Crew Vehicle Listing</PageTitle>
+<PageTitle>Operation Readiness Listing</PageTitle>
 
-<HeaderNav Title="Crew Vehicle Listing" />
+<HeaderNav Title="Operation Readiness Listing" />
 
 
 <div class="row mb-3">
@@ -25,7 +25,7 @@
         {
             @foreach (var vehicle in currentVehicles)
             {
-                <a>
+               <a href="/operation-readiness-listing/file">
                     <div class="rect-color rect-background">
                         <div class="rect">
                             <span class="rect-font">@vehicle.Name</span>
@@ -53,6 +53,8 @@
         </button>
     </div>
 </div>
+
+<FooterNav/>
 
 @code {
     private List<CrewVehicle> allVehicles = new();

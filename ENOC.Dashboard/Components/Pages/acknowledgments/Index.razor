@@ -1,0 +1,296 @@
+@using ENOC.Dashboard.Components.Layout
+@page "/incidents/{incidentId}/acknowledgments"
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
+<PageTitle>Acknowledgments</PageTitle>
+
+<HeaderNav Title="Acknowledgments"/>
+
+<div class="page-container">
+    <div class="user-management-container">
+        <div class="search-container">
+            <div class="search-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M20.9999 21L16.6499 16.65" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="text" class="form-control" placeholder="Search" @bind="searchTerm" @oninput="OnSearch" />
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        @foreach (var column in tableColumns)
+                        {
+                            <th>@column.DisplayName</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (currentPageAcknowledgments.Any())
+                    {
+                        @foreach (var acknowledgment in currentPageAcknowledgments)
+                        {
+                            <tr>
+                                <td>@acknowledgment.EmployeeNo</td>
+                                <td>@acknowledgment.FullName</td>
+                                <td><span class="@GetTeamBadgeClass(acknowledgment.Team)">@acknowledgment.Team</span></td>
+                                <td>@acknowledgment.Position</td>
+                                <td><span class="@GetAcknowledgementBadgeClass(acknowledgment.AcknowledgementStatus)">@acknowledgment.AcknowledgementStatus</span></td>
+                                <td>@acknowledgment.ETA</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center">No acknowledgments found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <nav class="pagination-container">
+            <ul class="pagination">
+                <li class="page-button @(currentPage == 1 ? "disabled" : "")" @onclick="GoToPreviousPage">
+                    <div>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 12H5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 19L5 12L12 5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </li>
+                
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    if (i <= 3 || i > totalPages - 2 || Math.Abs(i - currentPage) <= 1)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")" @onclick="() => GoToPage(i)">
+                            <div>@i</div>
+                        </li>
+                    }
+                    else if (i == 4 && currentPage < totalPages - 2)
+                    {
+                        <li class="page-item"><div>...</div></li>
+                    }
+                }
+                
+                <li class="page-button @(currentPage == totalPages ? "disabled" : "")" @onclick="GoToNextPage">
+                    <div>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 5L19 12L12 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<FooterNav/>
+
+@code {
+    [Parameter]
+    public string IncidentId { get; set; } = string.Empty;
+
+    private List<Acknowledgement> acknowledgments = new();
+    private List<Acknowledgement> filteredAcknowledgments = new();
+    private List<Acknowledgement> currentPageAcknowledgments = new();
+    private string searchTerm = string.Empty;
+    private int currentPage = 1;
+    private int pageSize = 4;
+    private int totalPages = 1;
+
+    private List<TableColumn> tableColumns = new()
+    {
+        new TableColumn { DisplayName = "Employee No", PropertyName = "EmployeeNo" },
+        new TableColumn { DisplayName = "Full Name", PropertyName = "FullName" },
+        new TableColumn { DisplayName = "Team", PropertyName = "Team" },
+        new TableColumn { DisplayName = "Position", PropertyName = "Position" },
+        new TableColumn { DisplayName = "Acknowledgement", PropertyName = "Acknowledgement" },
+        new TableColumn { DisplayName = "ETA", PropertyName = "ETA" }
+    };
+
+    protected override void OnInitialized()
+    {
+        LoadMockAcknowledgments();
+        ApplyFiltering();
+    }
+
+    protected override void OnParametersSet()
+    {
+        // You can use the IncidentId parameter to load specific incident acknowledgments
+        if (!string.IsNullOrEmpty(IncidentId))
+        {
+            // Load acknowledgments for this specific incident
+        }
+    }
+
+    private void LoadMockAcknowledgments()
+    {
+        acknowledgments = new List<Acknowledgement>
+        {
+            new Acknowledgement { 
+                EmployeeNo = 33221, 
+                FullName = "Kelly J. Walker", 
+                Team = "Red Team", 
+                Position = "STATION FIRE OFFICER", 
+                AcknowledgementStatus = "Yes", 
+                ETA = "30 min" 
+            },
+            new Acknowledgement { 
+                EmployeeNo = 33222, 
+                FullName = "Alma Hryal Attia", 
+                Team = "Green Team", 
+                Position = "STATION FIRE OFFICER", 
+                AcknowledgementStatus = "Yes", 
+                ETA = "25 min" 
+            },
+            new Acknowledgement { 
+                EmployeeNo = 33223, 
+                FullName = "Ilisa Fadi Isaa", 
+                Team = "White Team", 
+                Position = "STATION FIRE OFFICER", 
+                AcknowledgementStatus = "Yes", 
+                ETA = "45 min" 
+            },
+            new Acknowledgement { 
+                EmployeeNo = 33224, 
+                FullName = "Farraj Rdwar Kanaan", 
+                Team = "Black Team", 
+                Position = "STATION FIRE OFFICER", 
+                AcknowledgementStatus = "Yes", 
+                ETA = "15 min" 
+            },
+            new Acknowledgement { 
+                EmployeeNo = 33225, 
+                FullName = "John A. Smith", 
+                Team = "Red Team", 
+                Position = "STATION FIRE OFFICER", 
+                AcknowledgementStatus = "Yes", 
+                ETA = "35 min" 
+            },
+            new Acknowledgement { 
+                EmployeeNo = 33226, 
+                FullName = "Jane B. Johnson", 
+                Team = "Green Team", 
+                Position = "STATION FIRE OFFICER", 
+                AcknowledgementStatus = "Yes", 
+                ETA = "28 min" 
+            },
+            new Acknowledgement { 
+                EmployeeNo = 33227, 
+                FullName = "Robert C. Davis", 
+                Team = "White Team", 
+                Position = "STATION FIRE OFFICER", 
+                AcknowledgementStatus = "Yes", 
+                ETA = "50 min" 
+            },
+            new Acknowledgement { 
+                EmployeeNo = 33228, 
+                FullName = "Sarah M. Wilson", 
+                Team = "Black Team", 
+                Position = "STATION FIRE OFFICER", 
+                AcknowledgementStatus = "Yes", 
+                ETA = "22 min" 
+            }
+        };
+    }
+
+    private void ApplyFiltering()
+    {
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            filteredAcknowledgments = acknowledgments;
+        }
+        else
+        {
+            filteredAcknowledgments = acknowledgments.Where(a =>
+                a.EmployeeNo.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                a.FullName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                a.Team.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                a.Position.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                a.AcknowledgementStatus.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                a.ETA.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+        currentPage = 1;
+        UpdatePagination();
+    }
+
+    private void UpdatePagination()
+    {
+        totalPages = (int)Math.Ceiling((double)filteredAcknowledgments.Count / pageSize);
+        currentPageAcknowledgments = filteredAcknowledgments.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+    }
+
+    private void OnSearch(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? "";
+        ApplyFiltering();
+    }
+
+    private void GoToPage(int page)
+    {
+        if (page >= 1 && page <= totalPages)
+        {
+            currentPage = page;
+            UpdatePagination();
+            StateHasChanged();
+        }
+    }
+
+    private void GoToPreviousPage()
+    {
+        if (currentPage > 1) GoToPage(currentPage - 1);
+    }
+
+    private void GoToNextPage()
+    {
+        if (currentPage < totalPages) GoToPage(currentPage + 1);
+    }
+
+    private string GetTeamBadgeClass(string team)
+    {
+        return team.ToLower() switch
+        {
+            "red team" => "team-badge badge-red",
+            "green team" => "team-badge badge-green", 
+            "white team" => "team-badge badge-white",
+            "black team" => "team-badge badge-black",
+            _ => "team-badge badge-default"
+        };
+    }
+
+    private string GetAcknowledgementBadgeClass(string acknowledgement)
+    {
+        return acknowledgement.ToLower() switch
+        {
+            "yes" => "ack-badge badge-yes",
+            "no" => "ack-badge badge-no",
+            _ => "ack-badge badge-pending"
+        };
+    }
+
+    public class Acknowledgement
+    {
+        public int EmployeeNo { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string Team { get; set; } = string.Empty;
+        public string Position { get; set; } = string.Empty;
+        public string AcknowledgementStatus { get; set; } = string.Empty;
+        public string ETA { get; set; } = string.Empty;
+    }
+
+    public class TableColumn
+    {
+        public string DisplayName { get; set; } = string.Empty;
+        public string PropertyName { get; set; } = string.Empty;
+    }
+}

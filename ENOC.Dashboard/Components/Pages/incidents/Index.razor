@@ -1,21 +1,23 @@
 @using ENOC.Dashboard.Components.Layout
 @page "/incidents"
+@rendermode InteractiveServer
+
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
 
 <PageTitle>Incidents</PageTitle>
 
-
 <HeaderNav Title="Incidents"/>
-<div class="page-container bottom-drawer">
 
-        <div class="user-management-container">
+<div class="page-container">
+    <div class="user-management-container">
         <div class="search-container">
             <div class="search-box">
- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M20.9999 21L16.6499 16.65" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-
-                <input type="text" class="form-control" placeholder="Search">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M20.9999 21L16.6499 16.65" stroke="#D5D2D2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="text" class="form-control" placeholder="Search" @bind="searchTerm" @oninput="OnSearch" />
             </div>
         </div>
         
@@ -23,103 +25,343 @@
             <table class="user-table">
                 <thead>
                     <tr>
-                        <th>Incident Number</th>
-                        <th>Type</th>
-                        <th>Business unit</th>
-                        <th>Tank</th>
-                        <th>Status</th>
+                        @foreach (var column in tableColumns)
+                        {
+                            <th>@column.DisplayName</th>
+                        }
                         <th class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>2022212-4</td>
-                        <td>Kelly J. Walker</td>
-                        <td><span class="team-badge badge-management">DUGAS</span></td>
-                        <td>TK1</td>
-                        <td>Open</td>
-                        <td class="action-buttons text-center">
-                       <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</button>
-                        </td>
-                    </tr>
-                      <tr>
-                        <td>2022212-4</td>
-                        <td>Kelly J. Walker</td>
-                        <td><span class="team-badge badge-management">DUGAS</span></td>
-                        <td>TK1</td>
-                        <td>Open</td>
-                        <td class="action-buttons text-center">
-                       <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</button>
-                        </td>
-                    </tr>
-                         <tr>
-                        <td>2022212-4</td>
-                        <td>Kelly J. Walker</td>
-                        <td><span class="team-badge badge-management">DUGAS</span></td>
-                        <td>TK1</td>
-                        <td>Open</td>
-                        <td class="action-buttons text-center">
-                       <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</button>
-                        </td>
-                    </tr>
+                    @if (currentPageIncidents.Any())
+                    {
+                        @foreach (var incident in currentPageIncidents)
+                        {
+                            <tr>
+                                <td>@incident.IncidentNumber</td>
+                                <td>@incident.Type</td>
+                                <td><span class="@GetBusinessUnitBadgeClass(incident.BusinessUnit)">@incident.BusinessUnit</span></td>
+                                <td>@incident.Tank</td>
+                                <td><span class="@GetStatusBadgeClass(incident.Status)">@incident.Status</span></td>
+                                <td class="action-buttons text-center">
+                                    <div class="dropdown">
+                                        <button class="btn button-more" @onclick="() => ToggleActionMenu(incident.Id)">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                        @if (activeActionMenu == incident.Id)
+                                        {
+                                            <div class="action-menu show">
+                                                <button class="action-item" @onclick="() => ViewIncidentDetails(incident)">View</button>
+                                                <button class="action-item" @onclick="() => NavigateToAcknowledgments(incident.Id)">View Acknowledgments</button>
+                                            </div>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
                         <tr>
-                        <td>2022212-4</td>
-                        <td>Kelly J. Walker</td>
-                        <td><span class="team-badge badge-management">DUGAS</span></td>
-                        <td>TK1</td>
-                        <td>Open</td>
-                        <td class="action-buttons text-center">
-                       <button class="btn button-more"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M12 13C12.5523 13 13 12.5523 13 12C13 11.4477 12.5523 11 12 11C11.4477 11 11 11.4477 11 12C11 12.5523 11.4477 13 12 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M19 13C19.5523 13 20 12.5523 20 12C20 11.4477 19.5523 11 19 11C18.4477 11 18 11.4477 18 12C18 12.5523 18.4477 13 19 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M5 13C5.55228 13 6 12.5523 6 12C6 11.4477 5.55228 11 5 11C4.44772 11 4 11.4477 4 12C4 12.5523 4.44772 13 5 13Z" stroke="#B9B9B9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</button>
-                        </td>
-                    </tr>
+                            <td colspan="6" class="text-center">No incidents found</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
         
         <nav class="pagination-container">
-                <ul class="pagination">
-                    <li class="disabled page-button" style="margin-right:14px;"><div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M19 12H5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M12 19L5 12L12 5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</div></li>
-                    <li class="page-item active"><div>1</div></li>
-                    <li class="page-item"><div>2</div></li>
-                    <li class="page-item"><div>3</div></li>
-                     <li class="page-item"><div>3</div></li>
-                      <li class="page-item"><div>5</div></li>
-                         <li class="page-item"><div>...</div></li>
-                         <li class="page-item"><div>10</div></li>
-                    <li class="page-button" style="margin-left:14px;"><div><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M12 5L19 12L12 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-</div></li>
-                </ul>
+            <ul class="pagination">
+                <li class="page-button @(currentPage == 1 ? "disabled" : "")" @onclick="GoToPreviousPage">
+                    <div>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 12H5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 19L5 12L12 5" stroke="white" stroke-opacity="0.6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </li>
+                
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    if (i <= 3 || i > totalPages - 2 || Math.Abs(i - currentPage) <= 1)
+                    {
+                        <li class="page-item @(i == currentPage ? "active" : "")" @onclick="() => GoToPage(i)">
+                            <div>@i</div>
+                        </li>
+                    }
+                    else if (i == 4 && currentPage < totalPages - 2)
+                    {
+                        <li class="page-item"><div>...</div></li>
+                    }
+                }
+                
+                <li class="page-button @(currentPage == totalPages ? "disabled" : "")" @onclick="GoToNextPage">
+                    <div>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 5L19 12L12 19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </li>
+            </ul>
         </nav>
     </div>
 </div>
 
-<div class="bottom-container">
+@if (showDetailsModal)
+{
+    <div class="modal-backdrop show" @onclick="CloseDetailsModal"></div>
+    <div class="modal show" style="display: block;" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: #0C2340;">
+                <div class="modal-header">
+                    <h5 class="modal-title">Incident Details</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseDetailsModal"></button>
+                </div>
+                <div class="modal-body">
+                    @if (selectedIncident != null)
+                    {
+                        <div class="incident-details">
+                            <div class="detail-row"><strong>Incident Number:</strong> @selectedIncident.IncidentNumber</div>
+                            <div class="detail-row"><strong>Type:</strong> @selectedIncident.Type</div>
+                            <div class="detail-row"><strong>Business Unit:</strong> @selectedIncident.BusinessUnit</div>
+                            <div class="detail-row"><strong>Tank:</strong> @selectedIncident.Tank</div>
+                            <div class="detail-row"><strong>Status:</strong> @selectedIncident.Status</div>
+                            <div class="detail-row"><strong>Description:</strong> @selectedIncident.Description</div>
+                            <div class="detail-row"><strong>Reported Date:</strong> @selectedIncident.ReportedDate.ToString("yyyy-MM-dd HH:mm")</div>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer" style="justify-content: center;">
+                    <button type="button" class="btn custom-button" @onclick="CloseDetailsModal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
-</div>
+<FooterNav/>
+
+@code {
+    private List<Incident> incidents = new();
+    private List<Incident> filteredIncidents = new();
+    private List<Incident> currentPageIncidents = new();
+    private Incident? selectedIncident = null;
+    private string searchTerm = string.Empty;
+    private bool showDetailsModal = false;
+    private int activeActionMenu = 0;
+    private int currentPage = 1;
+    private int pageSize = 4;
+    private int totalPages = 1;
+
+    private List<TableColumn> tableColumns = new()
+    {
+        new TableColumn { DisplayName = "Incident Number", PropertyName = "IncidentNumber" },
+        new TableColumn { DisplayName = "Type", PropertyName = "Type" },
+        new TableColumn { DisplayName = "Business unit", PropertyName = "BusinessUnit" },
+        new TableColumn { DisplayName = "Tank", PropertyName = "Tank" },
+        new TableColumn { DisplayName = "Status", PropertyName = "Status" }
+    };
+
+    protected override void OnInitialized()
+    {
+        LoadMockIncidents();
+        ApplyFiltering();
+    }
+
+    private void LoadMockIncidents()
+    {
+        incidents = new List<Incident>
+        {
+            new Incident { 
+                Id = 1, 
+                IncidentNumber = "2022212-4", 
+                Type = "Chimical Leak", 
+                BusinessUnit = "DUGAS", 
+                Tank = "TK1", 
+                Status = "Open",
+                Description = "Minor leak detected in valve assembly",
+                ReportedDate = DateTime.Now.AddDays(-2)
+            },
+            new Incident { 
+                Id = 2, 
+                IncidentNumber = "2022212-5", 
+                Type = "Fire", 
+                BusinessUnit = "DUGAS", 
+                Tank = "TK2", 
+                Status = "In Progress",
+                Description = "High pressure reading in main pipeline",
+                ReportedDate = DateTime.Now.AddDays(-1)
+            },
+            new Incident { 
+                Id = 3, 
+                IncidentNumber = "2022212-6", 
+                Type = "Fire", 
+                BusinessUnit = "DUGAS", 
+                Tank = "TK3", 
+                Status = "Closed",
+                Description = "Temperature threshold exceeded",
+                ReportedDate = DateTime.Now.AddDays(-3)
+            },
+            new Incident { 
+                Id = 4, 
+                IncidentNumber = "2022212-7", 
+                Type = "Smoke", 
+                BusinessUnit = "DUGAS", 
+                Tank = "TK4", 
+                Status = "Open",
+                Description = "Pump failure in cooling system",
+                ReportedDate = DateTime.Now.AddHours(-5)
+            },
+             new Incident { 
+                Id = 5, 
+                IncidentNumber = "2022212-6", 
+                Type = "Fire", 
+                BusinessUnit = "DUGAS", 
+                Tank = "TK3", 
+                Status = "Closed",
+                Description = "Temperature threshold exceeded",
+                ReportedDate = DateTime.Now.AddDays(-3)
+            },
+            new Incident { 
+                Id = 6, 
+                IncidentNumber = "2022212-7", 
+                Type = "Smoke", 
+                BusinessUnit = "DUGAS", 
+                Tank = "TK4", 
+                Status = "Open",
+                Description = "Pump failure in cooling system",
+                ReportedDate = DateTime.Now.AddHours(-5)
+            }
+        };
+    }
+
+    private void ApplyFiltering()
+    {
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            filteredIncidents = incidents;
+        }
+        else
+        {
+            filteredIncidents = incidents.Where(i =>
+                i.IncidentNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                i.Type.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                i.BusinessUnit.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                i.Tank.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                i.Status.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+        currentPage = 1;
+        UpdatePagination();
+    }
+
+    private void UpdatePagination()
+    {
+        totalPages = (int)Math.Ceiling((double)filteredIncidents.Count / pageSize);
+        currentPageIncidents = filteredIncidents.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+    }
+
+    private void OnSearch(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? "";
+        ApplyFiltering();
+    }
+
+    private void ViewIncidentDetails(Incident incident)
+    {
+        selectedIncident = incident;
+        showDetailsModal = true;
+        activeActionMenu = 0;
+        StateHasChanged();
+    }
+
+    private void NavigateToAcknowledgements(int incidentId)
+    {
+        NavigationManager.NavigateTo($"/incidents/{incidentId}/acknowledgments");
+        activeActionMenu = 0;
+    }
+
+    private void CloseDetailsModal()
+    {
+        showDetailsModal = false;
+        selectedIncident = null;
+        StateHasChanged();
+    }
+
+    private void ToggleActionMenu(int incidentId)
+    {
+        activeActionMenu = activeActionMenu == incidentId ? 0 : incidentId;
+        StateHasChanged();
+    }
+
+    private void GoToPage(int page)
+    {
+        if (page >= 1 && page <= totalPages)
+        {
+            currentPage = page;
+            UpdatePagination();
+            StateHasChanged();
+        }
+    }
+
+    private void GoToPreviousPage()
+    {
+        if (currentPage > 1) GoToPage(currentPage - 1);
+    }
+
+    private void GoToNextPage()
+    {
+        if (currentPage < totalPages) GoToPage(currentPage + 1);
+    }
+
+    private string GetBusinessUnitBadgeClass(string businessUnit)
+    {
+        return businessUnit.ToLower() switch
+        {
+            "dugas" => "team-badge badge-management",
+            "refinery" => "team-badge badge-operation", 
+            "production" => "team-badge badge-black",
+            _ => "team-badge badge-green"
+        };
+    }
+
+    private string GetStatusBadgeClass(string status)
+    {
+        return status.ToLower() switch
+        {
+            "open" => "status-badge badge-open",
+            "in progress" => "status-badge badge-in-progress", 
+            "closed" => "status-badge badge-closed",
+            _ => "status-badge badge-default"
+        };
+    }
+
+    private void NavigateToAcknowledgments(int incidentId)
+    {
+        NavigationManager.NavigateTo($"/incidents/{incidentId}/acknowledgments");
+    }
+
+    public class Incident
+    {
+        public int Id { get; set; }
+        public string IncidentNumber { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
+        public string BusinessUnit { get; set; } = string.Empty;
+        public string Tank { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public DateTime ReportedDate { get; set; }
+        public string Priority { get; set; } = string.Empty;
+    }
+
+    public class TableColumn
+    {
+        public string DisplayName { get; set; } = string.Empty;
+        public string PropertyName { get; set; } = string.Empty;
+    }
+}

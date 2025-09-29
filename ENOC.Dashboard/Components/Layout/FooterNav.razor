@@ -1,0 +1,25 @@
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<div style="height: 84px;"/>
+<div class="page-footer">
+    <button class="btn custom-button" @onclick="NavigateBack">
+        Back
+    </button>
+</div>
+
+@code {
+    private async Task NavigateBack()
+    {
+        var canGoBack = await JSRuntime.InvokeAsync<bool>("eval", "window.history.length > 1");
+        
+        if (canGoBack)
+        {
+            await JSRuntime.InvokeVoidAsync("history.back");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}

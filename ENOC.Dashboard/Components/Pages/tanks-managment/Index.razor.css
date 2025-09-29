@@ -168,3 +168,71 @@
   border-width: 4px;
   border-radius: 65px;
 }
+
+.location-inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.location-inputs .form-control {
+  flex: 1;
+}
+
+.coordinate-separator {
+  color: white;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+}
+
+.erg-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.badge-management {
+  background-color: #e1f0ff;
+  color: #0a58ca;
+}
+.badge-operation {
+  background-color: #d1fae5;
+  color: #0d6e42;
+}
+.badge-black {
+  background-color: #1e293b;
+  color: white;
+}
+.badge-green {
+  background-color: #d1fae5;
+  color: #0d6e42;
+}
+.search-box {
+  max-width: 100%;
+}
+
+/* Form control styling for modal */
+.search-box .form-control {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.search-box .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.search-box select.form-control {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.search-box select.form-control option {
+  background: #0c2340;
+  color: white;
+}
