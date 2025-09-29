@@ -2,8 +2,6 @@ using ENOC.Dashboard.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-ENOC.Dashboard.Data.DataHelper.Initialize(builder.Environment);
-
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
