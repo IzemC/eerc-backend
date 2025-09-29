@@ -207,12 +207,13 @@
   background-color: #d1fae5;
   color: #0d6e42;
 }
-.search-box {
+
+.modal-body .search-box {
   max-width: 100%;
 }
 
 /* Form control styling for modal */
-.search-box .form-control {
+.modal-body .search-box .form-control {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
@@ -220,11 +221,11 @@
   padding: 12px 16px;
 }
 
-.search-box .form-control::placeholder {
+.modal-body .search-box .form-control::placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
 
-.search-box select.form-control {
+.modal-body .search-box select.form-control {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
@@ -232,7 +233,7 @@
   padding: 12px 16px;
 }
 
-.search-box select.form-control option {
+.modal-body .search-box select.form-control option {
   background: #0c2340;
   color: white;
 }
