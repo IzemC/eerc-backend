@@ -1,58 +1,109 @@
 <div class="teams-message">
-        <div class="teams-section">
-            <h3 class="header-font">Team</h3>
-            <div class="teams">
-                <div  class="rect-img rect-img-custom" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%), url('/incident-steps-images/team-management.png');">
-                    <span class="rect-img-font">Management</span>
-                </div>
-    
-                <div class="rect-img rect-img-custom" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%), url('/incident-steps-images/team-eerc.png');">
-                    <span class="rect-img-font">EERC</span>
-                </div>
+    <div class="teams-section">
+        <h3 class="header-font">Team</h3>
+        <div class="teams">
+            <div class="rect-img rect-img-custom" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%), url('/incident-steps-images/team-management.png');">
+                <span class="rect-img-font">Management</span>
             </div>
-        </div>
-        <div class="teams-section" style="flex-shrink: 2;">
-            <h3 class="header-font">Message</h3>
-           <div class="messages">
-            <div class="rect-button">
-                Message 1 content
-            </div>
-              <div class="rect-button">
-                Message 2 content
-            </div>
-              <div class="rect-button">
-                Message 3 content
-            </div>
-              <div class="rect-button">
-                Message 4 content
-            </div>
-              <div class="rect-button">
-                Message 5 content
-            </div>
-              <div class="rect-button">
-                Message 6 content
-            </div>
-           </div> 
-            <div style="display: flex; width: 100%; justify-content: end;">
-                    <button class="btn custom-button" data-bs-toggle="modal" data-bs-target="#AddCustomMessageModal" style="width: 100%;"><span class="rounded-blue-button-font">Custom message</span></button>
+            <div class="rect-img rect-img-custom" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%), url('/incident-steps-images/team-eerc.png');">
+                <span class="rect-img-font">EERC</span>
             </div>
         </div>
     </div>
+    <div class="teams-section" style="flex-shrink: 2;">
+        <h3 class="header-font">Message</h3>
+        <div class="messages search-box" style="max-width: 100%;">
+            <select class="form-select" @bind="selectedMessage">
+                <option value="" disabled selected>Select a message</option>
+                @foreach (var message in Messages)
+                {
+                    <option value="@message">@message</option>
+                }
+            </select>
+        </div>
+        <div style="display: flex; width: 100%; justify-content: end;">
+            <button class="btn custom-button" @onclick="OpenCustomMessageModal" style="width: 100%;">
+                <span class="rounded-blue-button-font">Custom message</span>
+            </button>
+        </div>
+    </div>
+</div>
 
-    @if(showConfirm == true){ <button id="form-button" class="btn btn-secondary btn-aqua rect-button-confirm incident-form-button mt-2"  @onclick="onConfirm">Confirm</button>}
+@if (showCustomMessageModal)
+{
+    <div class="modal show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+        <div class="modal-dialog" style="max-width: 660px;">
+            <div class="modal-content" style="gap: 24px;">
+                <div class="modal-header" style="align-items: center; padding: 0;">
+                    <h5 class="modal-title">Custom Message</h5>
+                    <button type="button" class="btn-close btn-close-white" @onclick="CloseCustomMessageModal"></button>
+                </div>
+                <div class="modal-body search-box" style="padding: 0; max-width: 100%;">
+                    <textarea class="form-control" @bind="customMessageText" rows="9" placeholder="Enter your custom message here..."></textarea>
+                </div>
+                <div class="modal-footer" style="justify-content: center; padding: 0;">
+                    <button type="button" class="btn custom-button" @onclick="AddCustomMessage">
+                        <span class="rounded-blue-button-font">Add</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
-@code{
+@if (showConfirm == true)
+{
+    <button id="form-button" class="btn btn-secondary btn-aqua rect-button-confirm incident-form-button mt-2" @onclick="onConfirm">Confirm</button>
+}
+
+@code {
     [Parameter]
-    public Func<Task> onConfirm {get; set;}
+    public Func<Task> onConfirm { get; set; }
 
     [Parameter]
-    public bool? showConfirm {get; set;}
+    public bool? showConfirm { get; set; }
+
+    private List<string> Messages = new List<string>
+    {
+        "Message 1 content",
+        "Message 2 content",
+        "Message 3 content",
+        "Message 4 content",
+        "Message 5 content",
+        "Message 6 content"
+    };
+
+    private string selectedMessage;
+    private bool showCustomMessageModal = false;
+    private string customMessageText = string.Empty;
 
     protected override void OnParametersSet()
     {
         if (showConfirm == null)
         {
             showConfirm = true;
+        }
+    }
+
+    private void OpenCustomMessageModal()
+    {
+        showCustomMessageModal = true;
+        customMessageText = string.Empty;
+    }
+
+    private void CloseCustomMessageModal()
+    {
+        showCustomMessageModal = false;
+        customMessageText = string.Empty;
+    }
+
+    private void AddCustomMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(customMessageText))
+        {
+            Messages.Add(customMessageText);
+            selectedMessage = customMessageText;
+            CloseCustomMessageModal();
         }
     }
 }

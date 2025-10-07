@@ -143,6 +143,18 @@ h1:focus {
       color: #d4d2d2;
     }
   }
+  textarea {
+    font-size: 14px;
+    padding: 16px;
+    border: none;
+    border-radius: 20px;
+    background: #ffffff40;
+    color: white;
+    padding-left: 18px;
+    &::placeholder {
+      color: #d4d2d2;
+    }
+  }
   svg {
     position: absolute;
     right: 15px;
