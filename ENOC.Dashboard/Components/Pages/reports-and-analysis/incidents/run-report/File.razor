@@ -1,0 +1,21 @@
+@page "/reports-and-analysis/incidents/{incidentId}/run-report"
+@using ENOC.Dashboard.Components.Layout
+
+@rendermode InteractiveServer
+
+<PageTitle>Run Report</PageTitle>
+
+<HeaderNav Title="Run Report" >
+
+<button class="btn custom-button" style="width: 326px">
+Export as PDF
+</button>
+</HeaderNav>
+
+
+<FooterNav/>
+
+@code {
+    [Parameter]
+    public string IncidentId { get; set; } = string.Empty;
+    }

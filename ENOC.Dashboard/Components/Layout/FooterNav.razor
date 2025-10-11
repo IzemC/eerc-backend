@@ -1,7 +1,15 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 
-<div style="height: 84px;"/>
+<style>
+:root{
+    --footer-height: 108px;
+    }
+</style>
+
+<div style="height: var(--footer-height);">
+</div>
+
 <div class="page-footer">
     <button class="btn custom-button" @onclick="NavigateBack">
         Back

@@ -1,10 +1,10 @@
-@page "/watch-report-and-defects"
+@page "/reports-and-analysis/defects-report-form"
 @using ENOC.Dashboard.Components.Layout
 @rendermode InteractiveServer
 
-<PageTitle>Shift Report</PageTitle>
+<PageTitle>Defects Report Form</PageTitle>
 
-<HeaderNav Title="Shift Report" />
+<HeaderNav Title="Defects Report Form" />
 
 <div class="row mb-3">
     <div class="col-xl-12 col-sm-12 col-xs-12 text-center">
@@ -23,7 +23,7 @@
         {
             @foreach (var report in currentReports)
             {
-                <a href="/watch-report-and-defects/file">
+               <a href="/reports-and-analysis/defects-report-form/file">
                     <div class="rect-background">
                         <div class="rect">
                             <span class="rect-font">@report.Name</span>

@@ -1,5 +1,5 @@
 @using ENOC.Dashboard.Components.Layout
-@page "/incidents"
+@page "/reports-and-analysis/incidents"
 @rendermode InteractiveServer
 
 @inject IJSRuntime JSRuntime
@@ -56,6 +56,7 @@
                                         {
                                             <div class="action-menu show">
                                                 <button class="action-item" @onclick="() => ViewIncidentDetails(incident)">View</button>
+                                                 <button class="action-item" @onclick="() => NavigateToRunReport(incident.Id)">View Run Report</button>
                                                 <button class="action-item" @onclick="() => NavigateToAcknowledgments(incident.Id)">View Acknowledgments</button>
                                             </div>
                                         }
@@ -282,7 +283,13 @@
 
     private void NavigateToAcknowledgements(int incidentId)
     {
-        NavigationManager.NavigateTo($"/incidents/{incidentId}/acknowledgments");
+        NavigationManager.NavigateTo($"/reports-and-analysis/incidents/{incidentId}/acknowledgments");
+        activeActionMenu = 0;
+    }
+
+    private void NavigateToRunReport(int incidentId)
+    {
+        NavigationManager.NavigateTo($"/reports-and-analysis/incidents/{incidentId}/run-report");
         activeActionMenu = 0;
     }
 

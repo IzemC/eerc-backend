@@ -1,4 +1,4 @@
-@page "/operation-readiness-listing"
+@page "/reports-and-analysis/operation-readiness-listing"
 @using ENOC.Dashboard.Components.Layout
 
 @rendermode InteractiveServer
@@ -25,7 +25,7 @@
         {
             @foreach (var vehicle in currentVehicles)
             {
-               <a href="/operation-readiness-listing/file">
+               <a href="/reports-and-analysis/operation-readiness-listing/file">
                     <div class="rect-color rect-background">
                         <div class="rect">
                             <span class="rect-font">@vehicle.Name</span>

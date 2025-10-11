@@ -1,0 +1,21 @@
+@page "/reports-and-analysis/watch-report-and-defects/equipment-checklist/{vehicleId}/file"
+@using ENOC.Dashboard.Components.Layout
+
+@rendermode InteractiveServer
+
+<PageTitle>Equipment Checklist</PageTitle>
+
+<HeaderNav Title="Equipment Checklist" >
+
+<button class="btn custom-button" style="width: 326px">
+Export as PDF
+</button>
+</HeaderNav>
+
+
+<FooterNav/>
+
+@code{
+    [Parameter]
+    public string VehicleId { get; set; } = string.Empty;
+}

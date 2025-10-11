@@ -5,7 +5,7 @@
         </div>
     </div>
 
-    <div class="row" id="incidentTypes" style="padding-bottom: 28px;">
+    <div class="d-flex gap-3" id="incidentTypes" style="padding-bottom: 28px;">
         @foreach (var incidentType in @IncidentTypes)
         {
             <div class="col-and-half">
@@ -27,7 +27,7 @@
     </div>
 
     <div class="container-fluid" style="position:relative; padding-bottom: 42px;">
-        <div class="row">
+        <div class="d-flex gap-2">
             @foreach (var unit in Units)
             {
                 <div class="col-and-half">
@@ -52,17 +52,22 @@
     public Func<Task> onConfirm {get; set;}
 
     private List<IncidentType> IncidentTypes = new List<IncidentType>{
-        new IncidentType{Id = "1", Name = "Fire", Image="/assets/alert-fire.png"},
-        new IncidentType{Id = "2", Name = "Smoke", Image="/assets/alert-smoke.png"},
-        new IncidentType{Id = "3", Name = "Gas Leak", Image="/assets/alert-gas-leak.png"},
-        new IncidentType{Id = "4", Name = "Chimical Leak", Image="assets/alert-chimical-leak.png"},
-        new IncidentType{Id = "5", Name = "Dangerous Goods", Image="assets/alert-dangerous-goods.png"},
+        new IncidentType{Id = "1", Name = "Fire (full emergency)", Image="/assets/alert-fire.png"},
+        new IncidentType{Id = "2", Name = "Weather standby", Image="/assets/alert-smoke.png"},
+        new IncidentType{Id = "3", Name = "Unlawful act", Image="/assets/alert-gas-leak.png"},
+        new IncidentType{Id = "4", Name = "Domestic fire", Image="assets/alert-chimical-leak.png"},
+        new IncidentType{Id = "5", Name = "Oil spillage", Image="assets/alert-dangerous-goods.png"},
+        new IncidentType{Id = "6", Name = "Fuel spillage", Image="assets/alert-dangerous-goods.png"},
+        new IncidentType{Id = "7", Name = "Dangerous goods", Image="assets/alert-dangerous-goods.png"},
         };
     private List<Unit> Units = new List<Unit>{
-        new Unit{Id = "1", IsSelected = true, Name = "Unit 1"},
-        new Unit{Id = "2", IsSelected = false, Name = "Unit 2"},
-        new Unit{Id = "3", IsSelected = false, Name = "Unit 3"},
-        new Unit{Id= "4", IsSelected=false, Name= "Unit 4"}
+        new Unit{Id = "1", IsSelected = true, Name = "EPCL"},
+        new Unit{Id = "2", IsSelected = false, Name = "EIL"},
+        new Unit{Id = "3", IsSelected = false, Name = "DOUGAS"},
+        new Unit{Id= "4", IsSelected=false, Name= "EMGAS"},
+        new Unit{Id= "5", IsSelected=false, Name= "HEJP - FALCON"},
+        new Unit{Id= "6", IsSelected=false, Name= "HJATL"},
+        new Unit{Id= "7", IsSelected=false, Name= "DLPP"},
         };
 
 
