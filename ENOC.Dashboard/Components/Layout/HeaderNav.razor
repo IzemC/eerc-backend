@@ -1,5 +1,6 @@
 @rendermode InteractiveServer
 @inject NavigationManager NavigationManager
+@inject AuthStateService AuthState
 
 @{
     string logoStyle = "";
@@ -76,11 +77,10 @@
         showMenu = false;
     }
 
-    private void HandleLogout()
+    private async Task HandleLogout()
     {
-
         showMenu = false;
-        
-        Console.WriteLine("Logout clicked - authentication not implemented yet");
+        await AuthState.LogoutAsync();
+        NavigationManager.NavigateTo("/login", true);
     }
 }

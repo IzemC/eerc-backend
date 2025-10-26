@@ -1,15 +1,67 @@
 <div class="buttons">
-    <div class="rect-button">
+    <button type="button"
+            class="rect-button @(selectedFinalAction == "Close incident" ? "selected" : "")"
+            @onclick="@(() => SelectFinalAction("Close incident"))">
         Close the  <br/> incident
-    </div>
-    <div class="rect-button">
+    </button>
+    <button type="button"
+            class="rect-button @(selectedFinalAction == "Stand down" ? "selected" : "")"
+            @onclick="@(() => SelectFinalAction("Stand down"))">
         Stand down
-    </div>
+    </button>
 </div>
 
-            <button id="form-button" class="btn btn-secondary btn-aqua rect-button-confirm submit-button incident-form-button"  @onclick="onConfirm">Confirm</button>
+<button type="button"
+        id="form-button"
+        class="btn btn-secondary btn-aqua rect-button-confirm submit-button incident-form-button"
+        @onclick="HandleConfirm"
+        disabled="@(!CanConfirm)">
+    @(isSubmitting ? "Submitting..." : "Confirm")
+</button>
 
 @code{
     [Parameter]
-    public Func<Task> onConfirm {get; set;}
+    public Func<Task> onConfirm { get; set; }
+
+    [Parameter]
+    public IncidentFormState? FormState { get; set; }
+
+    private string? selectedFinalAction;
+    private bool isSubmitting = false;
+
+    private bool CanConfirm => !string.IsNullOrEmpty(selectedFinalAction) && !isSubmitting;
+
+    protected override void OnInitialized()
+    {
+        // Load previous selection if any
+        if (FormState != null)
+        {
+            selectedFinalAction = FormState.FinalAction;
+        }
+    }
+
+    private void SelectFinalAction(string action)
+    {
+        selectedFinalAction = action;
+        if (FormState != null)
+        {
+            FormState.FinalAction = action;
+        }
+    }
+
+    private async Task HandleConfirm()
+    {
+        if (CanConfirm && onConfirm != null)
+        {
+            isSubmitting = true;
+            try
+            {
+                await onConfirm();
+            }
+            finally
+            {
+                isSubmitting = false;
+            }
+        }
+    }
 }

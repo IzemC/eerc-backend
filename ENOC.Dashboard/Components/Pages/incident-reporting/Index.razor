@@ -1,8 +1,9 @@
 @page "/incident-reporting"
-
 @rendermode InteractiveServer
-
 @using ENOC.Dashboard.Components.Layout
+@using ENOC.Dashboard.Models
+@inject IncidentApiService IncidentApi
+@inject NavigationManager Navigation
 
 
 <PageTitle>Incident Alert Management System</PageTitle>
@@ -32,22 +33,22 @@
     </div>
     }
     @if (currentStep == 1){
-        <FirstStep onConfirm="ConfirmStep"/>
+        <FirstStep FormState="@formState" onConfirm="ConfirmStep"/>
     }
     @if (currentStep == 2){
-        <SecondStep onConfirm="ConfirmStep"/>
+        <SecondStep FormState="@formState" onConfirm="ConfirmStep"/>
     }
     @if (currentStep == 3){
-        <ThirdStep onConfirm="ConfirmStep"/>
+        <ThirdStep FormState="@formState" onConfirm="ConfirmStep"/>
     }
     @if(currentStep == 4){
         <FourthStep onConfirm="ConfirmStep"/>
     }
     @if(currentStep == 5){
-        <FifthStep onConfirm="ConfirmStep"/>
+        <FifthStep FormState="@formState" onConfirm="SubmitIncident"/>
     }
     @if(currentStep == 6){
-        <ReportDetails onConfirm="ConfirmStep"/>
+        <ReportDetails CreatedIncident="@createdIncident" FormState="@formState" onConfirm="CompleteIncident"/>
     }
 
     <div class="steps-container">
@@ -83,6 +84,10 @@
     public string? currentStepStr {get; set;}
     private int currentStep = 0;
     private List<int> completedSteps = new List<int>();
+    private IncidentFormState formState = new();
+    private bool isSubmitting = false;
+    private Incident? createdIncident = null;
+
     private List<StepModel> steps = new List<StepModel>
     {
         new StepModel { Number = 1, Title = "Open incident", Link = "/incident-reporting/1" },
@@ -147,11 +152,68 @@
         {
             currentStep++;
             StateHasChanged();
-        } 
+        }
     }
-        private async Task ConfirmStep()
+
+    private async Task ConfirmStep()
     {
         currentStep++;
+        StateHasChanged();
+    }
+
+    private async Task SubmitIncident()
+    {
+        if (isSubmitting) return;
+
+        try
+        {
+            isSubmitting = true;
+
+            // Create incident request
+            var request = new CreateIncidentRequest
+            {
+                IncidentTypeId = formState.IncidentTypeId ?? Guid.Empty,
+                UnitId = formState.BusinessUnitId ?? Guid.Empty,
+                MessageId = formState.MessageId ?? Guid.Empty,
+                TankId = formState.TankId,
+                ReporterName = formState.ReporterName,
+                ReporterContactDetails = formState.ReporterContactDetails,
+                CustomMessage = formState.CustomMessage,
+                Action = formState.Action
+            };
+
+            var result = await IncidentApi.CreateIncidentAsync(request);
+
+            if (result != null)
+            {
+                // Store the created incident
+                createdIncident = result;
+                // Move to report details step
+                currentStep++;
+                StateHasChanged();
+            }
+            else
+            {
+                // Show error message
+                Console.WriteLine("Failed to create incident");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating incident: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private async Task CompleteIncident()
+    {
+        // Reset form and go back to start
+        formState.Reset();
+        currentStep = 0;
+        completedSteps.Clear();
         StateHasChanged();
     }
     

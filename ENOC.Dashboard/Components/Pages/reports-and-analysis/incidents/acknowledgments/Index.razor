@@ -1,8 +1,10 @@
 @using ENOC.Dashboard.Components.Layout
+@using ENOC.Dashboard.Models
 @page "/reports-and-analysis/incidents/{incidentId}/acknowledgments"
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject IncidentApiService IncidentApi
 
 <PageTitle>Acknowledgments</PageTitle>
 
@@ -117,90 +119,47 @@
         new TableColumn { DisplayName = "ETA", PropertyName = "ETA" }
     };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        LoadMockAcknowledgments();
+        await LoadAcknowledgmentsAsync();
         ApplyFiltering();
     }
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
-        // You can use the IncidentId parameter to load specific incident acknowledgments
+        // Load acknowledgments when incident ID changes
         if (!string.IsNullOrEmpty(IncidentId))
         {
-            // Load acknowledgments for this specific incident
+            await LoadAcknowledgmentsAsync();
+            ApplyFiltering();
         }
     }
 
-    private void LoadMockAcknowledgments()
+    private async Task LoadAcknowledgmentsAsync()
     {
-        acknowledgments = new List<Acknowledgement>
+        if (string.IsNullOrEmpty(IncidentId) || !Guid.TryParse(IncidentId, out var incidentGuid))
         {
-            new Acknowledgement { 
-                EmployeeNo = 33221, 
-                FullName = "Kelly J. Walker", 
-                Team = "Red Team", 
-                Position = "STATION FIRE OFFICER", 
-                AcknowledgementStatus = "Yes", 
-                ETA = "30 min" 
-            },
-            new Acknowledgement { 
-                EmployeeNo = 33222, 
-                FullName = "Alma Hryal Attia", 
-                Team = "Green Team", 
-                Position = "STATION FIRE OFFICER", 
-                AcknowledgementStatus = "Yes", 
-                ETA = "25 min" 
-            },
-            new Acknowledgement { 
-                EmployeeNo = 33223, 
-                FullName = "Ilisa Fadi Isaa", 
-                Team = "White Team", 
-                Position = "STATION FIRE OFFICER", 
-                AcknowledgementStatus = "Yes", 
-                ETA = "45 min" 
-            },
-            new Acknowledgement { 
-                EmployeeNo = 33224, 
-                FullName = "Farraj Rdwar Kanaan", 
-                Team = "Black Team", 
-                Position = "STATION FIRE OFFICER", 
-                AcknowledgementStatus = "Yes", 
-                ETA = "15 min" 
-            },
-            new Acknowledgement { 
-                EmployeeNo = 33225, 
-                FullName = "John A. Smith", 
-                Team = "Red Team", 
-                Position = "STATION FIRE OFFICER", 
-                AcknowledgementStatus = "Yes", 
-                ETA = "35 min" 
-            },
-            new Acknowledgement { 
-                EmployeeNo = 33226, 
-                FullName = "Jane B. Johnson", 
-                Team = "Green Team", 
-                Position = "STATION FIRE OFFICER", 
-                AcknowledgementStatus = "Yes", 
-                ETA = "28 min" 
-            },
-            new Acknowledgement { 
-                EmployeeNo = 33227, 
-                FullName = "Robert C. Davis", 
-                Team = "White Team", 
-                Position = "STATION FIRE OFFICER", 
-                AcknowledgementStatus = "Yes", 
-                ETA = "50 min" 
-            },
-            new Acknowledgement { 
-                EmployeeNo = 33228, 
-                FullName = "Sarah M. Wilson", 
-                Team = "Black Team", 
-                Position = "STATION FIRE OFFICER", 
-                AcknowledgementStatus = "Yes", 
-                ETA = "22 min" 
-            }
-        };
+            acknowledgments = new List<Acknowledgement>();
+            return;
+        }
+
+        var acknowledgementsFromApi = await IncidentApi.GetIncidentAcknowledgementsAsync(incidentGuid);
+        if (acknowledgementsFromApi != null)
+        {
+            acknowledgments = acknowledgementsFromApi.Select(ack => new Acknowledgement
+            {
+                EmployeeNo = int.TryParse(ack.UserEmployeeId, out var empNo) ? empNo : 0,
+                FullName = ack.UserName,
+                Team = "N/A", // Team info not included in API response
+                Position = "N/A", // Position info not included in API response
+                AcknowledgementStatus = ack.AcknowledgementStatus ?? "Pending",
+                ETA = ack.Eta ?? "N/A"
+            }).ToList();
+        }
+        else
+        {
+            acknowledgments = new List<Acknowledgement>();
+        }
     }
 
     private void ApplyFiltering()
@@ -260,10 +219,12 @@
     {
         return team.ToLower() switch
         {
-            "red team" => "team-badge badge-red",
-            "green team" => "team-badge badge-green", 
-            "white team" => "team-badge badge-white",
-            "black team" => "team-badge badge-black",
+            "red" => "team-badge badge-operation",
+            "green" => "team-badge badge-green",
+            "white" => "team-badge badge-default",
+            "black" => "team-badge badge-black",
+            "management" => "team-badge badge-management",
+            "n/a" => "team-badge badge-default",
             _ => "team-badge badge-default"
         };
     }

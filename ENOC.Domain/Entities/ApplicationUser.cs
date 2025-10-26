@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ENOC.Domain.Entities
 {
-    public class ApplicationUser : IdentityUser
+    public class ApplicationUser : IdentityUser<Guid>
     {
         [StringLength(150)]
         public required string FirstName { get; set; }

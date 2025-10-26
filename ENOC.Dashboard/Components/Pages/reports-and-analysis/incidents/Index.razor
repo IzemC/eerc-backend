@@ -1,9 +1,11 @@
 @using ENOC.Dashboard.Components.Layout
+@using ENOC.Dashboard.Models
 @page "/reports-and-analysis/incidents"
 @rendermode InteractiveServer
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@inject IncidentApiService IncidentApi
 
 <PageTitle>Incidents</PageTitle>
 
@@ -38,10 +40,10 @@
                         @foreach (var incident in currentPageIncidents)
                         {
                             <tr>
-                                <td>@incident.IncidentNumber</td>
-                                <td>@incident.Type</td>
-                                <td><span class="@GetBusinessUnitBadgeClass(incident.BusinessUnit)">@incident.BusinessUnit</span></td>
-                                <td>@incident.Tank</td>
+                                <td>@incident.IncidentId</td>
+                                <td>@incident.IncidentTypeName</td>
+                                <td><span class="@GetBusinessUnitBadgeClass(incident.UnitName)">@incident.UnitName</span></td>
+                                <td>@(incident.TankName ?? "N/A")</td>
                                 <td><span class="@GetStatusBadgeClass(incident.Status)">@incident.Status</span></td>
                                 <td class="action-buttons text-center">
                                     <div class="dropdown">
@@ -57,7 +59,7 @@
                                             <div class="action-menu show">
                                                 <button class="action-item" @onclick="() => ViewIncidentDetails(incident)">View</button>
                                                  <button class="action-item" @onclick="() => NavigateToRunReport(incident.Id)">View Run Report</button>
-                                                <button class="action-item" @onclick="() => NavigateToAcknowledgments(incident.Id)">View Acknowledgments</button>
+                                                <button class="action-item" @onclick="() => NavigateToAcknowledgements(incident.Id)">View Acknowledgments</button>
                                             </div>
                                         }
                                     </div>
@@ -127,13 +129,13 @@
                     @if (selectedIncident != null)
                     {
                         <div class="incident-details">
-                            <div class="detail-row"><strong>Incident Number:</strong> @selectedIncident.IncidentNumber</div>
-                            <div class="detail-row"><strong>Type:</strong> @selectedIncident.Type</div>
-                            <div class="detail-row"><strong>Business Unit:</strong> @selectedIncident.BusinessUnit</div>
-                            <div class="detail-row"><strong>Tank:</strong> @selectedIncident.Tank</div>
+                            <div class="detail-row"><strong>Incident Number:</strong> @selectedIncident.IncidentId</div>
+                            <div class="detail-row"><strong>Type:</strong> @selectedIncident.IncidentTypeName</div>
+                            <div class="detail-row"><strong>Business Unit:</strong> @selectedIncident.UnitName</div>
+                            <div class="detail-row"><strong>Tank:</strong> @(selectedIncident.TankName ?? "N/A")</div>
                             <div class="detail-row"><strong>Status:</strong> @selectedIncident.Status</div>
-                            <div class="detail-row"><strong>Description:</strong> @selectedIncident.Description</div>
-                            <div class="detail-row"><strong>Reported Date:</strong> @selectedIncident.ReportedDate.ToString("yyyy-MM-dd HH:mm")</div>
+                            <div class="detail-row"><strong>Message:</strong> @(selectedIncident.MessageDescription ?? selectedIncident.CustomMessage ?? "No message")</div>
+                            <div class="detail-row"><strong>Reported Date:</strong> @selectedIncident.CreatedAt.ToString("yyyy-MM-dd HH:mm")</div>
                         </div>
                     }
                 </div>
@@ -154,7 +156,7 @@
     private Incident? selectedIncident = null;
     private string searchTerm = string.Empty;
     private bool showDetailsModal = false;
-    private int activeActionMenu = 0;
+    private Guid activeActionMenu = Guid.Empty;
     private int currentPage = 1;
     private int pageSize = 4;
     private int totalPages = 1;
@@ -168,77 +170,19 @@
         new TableColumn { DisplayName = "Status", PropertyName = "Status" }
     };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        LoadMockIncidents();
+        await LoadIncidentsAsync();
         ApplyFiltering();
     }
 
-    private void LoadMockIncidents()
+    private async Task LoadIncidentsAsync()
     {
-        incidents = new List<Incident>
+        var incidentsFromApi = await IncidentApi.GetAllIncidentsAsync();
+        if (incidentsFromApi != null)
         {
-            new Incident { 
-                Id = 1, 
-                IncidentNumber = "2022212-4", 
-                Type = "Chimical Leak", 
-                BusinessUnit = "DUGAS", 
-                Tank = "TK1", 
-                Status = "Open",
-                Description = "Minor leak detected in valve assembly",
-                ReportedDate = DateTime.Now.AddDays(-2)
-            },
-            new Incident { 
-                Id = 2, 
-                IncidentNumber = "2022212-5", 
-                Type = "Fire", 
-                BusinessUnit = "DUGAS", 
-                Tank = "TK2", 
-                Status = "In Progress",
-                Description = "High pressure reading in main pipeline",
-                ReportedDate = DateTime.Now.AddDays(-1)
-            },
-            new Incident { 
-                Id = 3, 
-                IncidentNumber = "2022212-6", 
-                Type = "Fire", 
-                BusinessUnit = "DUGAS", 
-                Tank = "TK3", 
-                Status = "Closed",
-                Description = "Temperature threshold exceeded",
-                ReportedDate = DateTime.Now.AddDays(-3)
-            },
-            new Incident { 
-                Id = 4, 
-                IncidentNumber = "2022212-7", 
-                Type = "Smoke", 
-                BusinessUnit = "DUGAS", 
-                Tank = "TK4", 
-                Status = "Open",
-                Description = "Pump failure in cooling system",
-                ReportedDate = DateTime.Now.AddHours(-5)
-            },
-             new Incident { 
-                Id = 5, 
-                IncidentNumber = "2022212-6", 
-                Type = "Fire", 
-                BusinessUnit = "DUGAS", 
-                Tank = "TK3", 
-                Status = "Closed",
-                Description = "Temperature threshold exceeded",
-                ReportedDate = DateTime.Now.AddDays(-3)
-            },
-            new Incident { 
-                Id = 6, 
-                IncidentNumber = "2022212-7", 
-                Type = "Smoke", 
-                BusinessUnit = "DUGAS", 
-                Tank = "TK4", 
-                Status = "Open",
-                Description = "Pump failure in cooling system",
-                ReportedDate = DateTime.Now.AddHours(-5)
-            }
-        };
+            incidents = incidentsFromApi;
+        }
     }
 
     private void ApplyFiltering()
@@ -250,10 +194,10 @@
         else
         {
             filteredIncidents = incidents.Where(i =>
-                i.IncidentNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                i.Type.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                i.BusinessUnit.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                i.Tank.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                i.IncidentId.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                i.IncidentTypeName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                i.UnitName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                (i.TankName != null && i.TankName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
                 i.Status.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
             ).ToList();
         }
@@ -273,24 +217,29 @@
         ApplyFiltering();
     }
 
-    private void ViewIncidentDetails(Incident incident)
+    private async Task ViewIncidentDetails(Incident incident)
     {
-        selectedIncident = incident;
-        showDetailsModal = true;
-        activeActionMenu = 0;
+        // Fetch full incident details from API
+        var fullIncident = await IncidentApi.GetIncidentByIdAsync(incident.Id);
+        if (fullIncident != null)
+        {
+            selectedIncident = fullIncident;
+            showDetailsModal = true;
+        }
+        activeActionMenu = Guid.Empty;
         StateHasChanged();
     }
 
-    private void NavigateToAcknowledgements(int incidentId)
+    private void NavigateToAcknowledgements(Guid incidentId)
     {
         NavigationManager.NavigateTo($"/reports-and-analysis/incidents/{incidentId}/acknowledgments");
-        activeActionMenu = 0;
+        activeActionMenu = Guid.Empty;
     }
 
-    private void NavigateToRunReport(int incidentId)
+    private void NavigateToRunReport(Guid incidentId)
     {
         NavigationManager.NavigateTo($"/reports-and-analysis/incidents/{incidentId}/run-report");
-        activeActionMenu = 0;
+        activeActionMenu = Guid.Empty;
     }
 
     private void CloseDetailsModal()
@@ -300,9 +249,9 @@
         StateHasChanged();
     }
 
-    private void ToggleActionMenu(int incidentId)
+    private void ToggleActionMenu(Guid incidentId)
     {
-        activeActionMenu = activeActionMenu == incidentId ? 0 : incidentId;
+        activeActionMenu = activeActionMenu == incidentId ? Guid.Empty : incidentId;
         StateHasChanged();
     }
 
@@ -342,28 +291,10 @@
         return status.ToLower() switch
         {
             "open" => "status-badge badge-open",
-            "in progress" => "status-badge badge-in-progress", 
+            "in progress" => "status-badge badge-in-progress",
             "closed" => "status-badge badge-closed",
             _ => "status-badge badge-default"
         };
-    }
-
-    private void NavigateToAcknowledgments(int incidentId)
-    {
-        NavigationManager.NavigateTo($"/incidents/{incidentId}/acknowledgments");
-    }
-
-    public class Incident
-    {
-        public int Id { get; set; }
-        public string IncidentNumber { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
-        public string BusinessUnit { get; set; } = string.Empty;
-        public string Tank { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public DateTime ReportedDate { get; set; }
-        public string Priority { get; set; } = string.Empty;
     }
 
     public class TableColumn

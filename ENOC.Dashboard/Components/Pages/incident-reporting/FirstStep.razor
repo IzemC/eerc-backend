@@ -1,3 +1,7 @@
+@rendermode InteractiveServer
+@using ENOC.Dashboard.Models
+@inject LookupApiService LookupApi
+
 <form id="form" method="post">
     <div class="row">
         <div class="col-12">
@@ -9,7 +13,8 @@
         @foreach (var incidentType in @IncidentTypes)
         {
             <div class="col-and-half">
-                <a class="incident-type" data-id="@incidentType.Id">
+                <a class="incident-type @(selectedIncidentTypeId?.ToString() == incidentType.Id ? "selected" : "")"
+                   @onclick="@(() => SelectIncidentType(incidentType.Id, incidentType.Name))">
                     <div class="rect-img" style="background:linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 100%), url('@incidentType.Image');">
                         <div class="rect-img-blur">
                             <span class="rect-img-font">@incidentType.Name</span>
@@ -31,60 +36,122 @@
             @foreach (var unit in Units)
             {
                 <div class="col-and-half">
-                    <button type="button" class="unit btn-selection btn-aqua rect-button" data-id="@unit.Id" data-selected="@unit.IsSelected">@unit.Name</button>
+                    <button type="button"
+                            class="unit btn-selection btn-aqua rect-button @(selectedBusinessUnitId?.ToString() == unit.Id ? "selected" : "")"
+                            @onclick="@(() => SelectBusinessUnit(unit.Id, unit.Name))">
+                        @unit.Name
+                    </button>
                 </div>
             }
         </div>
     </div>
 
-    <input hidden type="text" name="unitId" required />
-    <input hidden type="text" name="incidentTypeId" required />
-    <input hidden type="text" name="unit" required />
-    <input hidden type="text" name="incidentType" required />
-    <button type="submit" hidden></button>
-
-            <button id="form-button" class="btn btn-secondary btn-aqua rect-button-confirm submit-button incident-form-button"  @onclick="onConfirm">Confirm</button>
+    <button type="button"
+            id="form-button"
+            class="btn btn-secondary btn-aqua rect-button-confirm submit-button incident-form-button"
+            @onclick="HandleConfirm"
+            disabled="@(!CanConfirm)">
+        Confirm
+    </button>
 </form>
 
 @code {
 
     [Parameter]
-    public Func<Task> onConfirm {get; set;}
+    public Func<Task> onConfirm { get; set; }
 
-    private List<IncidentType> IncidentTypes = new List<IncidentType>{
-        new IncidentType{Id = "1", Name = "Fire (full emergency)", Image="/assets/alert-fire.png"},
-        new IncidentType{Id = "2", Name = "Weather standby", Image="/assets/alert-smoke.png"},
-        new IncidentType{Id = "3", Name = "Unlawful act", Image="/assets/alert-gas-leak.png"},
-        new IncidentType{Id = "4", Name = "Domestic fire", Image="assets/alert-chimical-leak.png"},
-        new IncidentType{Id = "5", Name = "Oil spillage", Image="assets/alert-dangerous-goods.png"},
-        new IncidentType{Id = "6", Name = "Fuel spillage", Image="assets/alert-dangerous-goods.png"},
-        new IncidentType{Id = "7", Name = "Dangerous goods", Image="assets/alert-dangerous-goods.png"},
-        };
-    private List<Unit> Units = new List<Unit>{
-        new Unit{Id = "1", IsSelected = true, Name = "EPCL"},
-        new Unit{Id = "2", IsSelected = false, Name = "EIL"},
-        new Unit{Id = "3", IsSelected = false, Name = "DOUGAS"},
-        new Unit{Id= "4", IsSelected=false, Name= "EMGAS"},
-        new Unit{Id= "5", IsSelected=false, Name= "HEJP - FALCON"},
-        new Unit{Id= "6", IsSelected=false, Name= "HJATL"},
-        new Unit{Id= "7", IsSelected=false, Name= "DLPP"},
-        };
+    [Parameter]
+    public IncidentFormState? FormState { get; set; }
 
+    private List<IncidentTypeModel> IncidentTypes = new();
+    private List<UnitModel> Units = new();
+    private Guid? selectedIncidentTypeId;
+    private Guid? selectedBusinessUnitId;
 
-       public class Unit {
-        public string Id { get; set; }
-        public bool IsSelected { get; set; }
-        public string Name { get; set; }    
+    private bool CanConfirm => selectedIncidentTypeId.HasValue && selectedBusinessUnitId.HasValue;
 
-       }
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
 
-       public class IncidentType {
-        public string Id { get; set; }
-        public string Name { get; set; }
-      
-        public string Image {get; set;}
-
-       }
+        // Load previous selections if any
+        if (FormState != null)
+        {
+            selectedIncidentTypeId = FormState.IncidentTypeId;
+            selectedBusinessUnitId = FormState.BusinessUnitId;
+        }
     }
+
+    private async Task LoadDataAsync()
+    {
+        var incidentTypes = await LookupApi.GetIncidentTypesAsync();
+        if (incidentTypes != null)
+        {
+            IncidentTypes = incidentTypes.Select(it => new IncidentTypeModel
+            {
+                Id = it.Id.ToString(),
+                Name = it.Name,
+                Image = it.Image ?? "/assets/default-incident.png"
+            }).ToList();
+        }
+
+        var businessUnits = await LookupApi.GetBusinessUnitsAsync();
+        if (businessUnits != null)
+        {
+            Units = businessUnits.Select(bu => new UnitModel
+            {
+                Id = bu.Id.ToString(),
+                Name = bu.Name,
+                IsSelected = false
+            }).ToList();
+        }
+    }
+
+    private void SelectIncidentType(string id, string name)
+    {
+        if (Guid.TryParse(id, out var guid))
+        {
+            selectedIncidentTypeId = guid;
+            if (FormState != null)
+            {
+                FormState.IncidentTypeId = guid;
+                FormState.IncidentTypeName = name;
+            }
+        }
+    }
+
+    private void SelectBusinessUnit(string id, string name)
+    {
+        if (Guid.TryParse(id, out var guid))
+        {
+            selectedBusinessUnitId = guid;
+            if (FormState != null)
+            {
+                FormState.BusinessUnitId = guid;
+                FormState.BusinessUnitName = name;
+            }
+        }
+    }
+
+    private async Task HandleConfirm()
+    {
+        if (CanConfirm && onConfirm != null)
+        {
+            await onConfirm();
+        }
+    }
+
+    public class UnitModel {
+        public string Id { get; set; } = string.Empty;
+        public bool IsSelected { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+
+    public class IncidentTypeModel {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Image {get; set;} = string.Empty;
+    }
+}
     
  

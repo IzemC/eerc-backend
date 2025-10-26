@@ -1,7 +1,10 @@
 @using ENOC.Dashboard.Components.Layout
+@using ENOC.Dashboard.Models
 @page "/tanks-management"
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
+@inject TankApiService TankApi
+@inject LookupApiService LookupApi
 
 <PageTitle>Manage Tanks</PageTitle>
 
@@ -161,6 +164,7 @@
     private List<Tank> tanks = new();
     private List<Tank> filteredTanks = new();
     private List<Tank> currentPageTanks = new();
+    private List<BusinessUnit> businessUnits = new();
     private Tank currentTank = new();
     private string searchTerm = string.Empty;
     private bool showModal = false;
@@ -179,23 +183,33 @@
         new TableColumn { DisplayName = "Location", PropertyName = "Location" }
     };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        LoadMockTanks();
+        await LoadTanksAsync();
+        await LoadBusinessUnitsAsync();
         ApplyFiltering();
     }
 
-    private void LoadMockTanks()
+    private async Task LoadTanksAsync()
     {
-        tanks = new List<Tank>
+        var tanksFromApi = await TankApi.GetAllTanksAsync();
+        if (tanksFromApi != null)
         {
-            new Tank { Id = 1, TankNumber = 1, BusinessUnit = "EPCL", Location = "24.8607° - 67.0011°", ERG = "Standard emergency response" },
-            new Tank { Id = 2, TankNumber = 2, BusinessUnit = "EPCL", Location = "24.8608° - 67.0012°", ERG = "High pressure protocol" },
-            new Tank { Id = 3, TankNumber = 3, BusinessUnit = "DUGAS", Location = "24.8609° - 67.0013°", ERG = "Gas leak procedure" },
-            new Tank { Id = 4, TankNumber = 4, BusinessUnit = "DUGAS", Location = "24.8610° - 67.0014°", ERG = "Production safety guidelines" },
-            new Tank { Id = 5, TankNumber = 5, BusinessUnit = "EPCL", Location = "24.8611° - 67.0015°", ERG = "Chemical storage protocol" },
-            new Tank { Id = 6, TankNumber = 6, BusinessUnit = "DUGAS", Location = "24.8612° - 67.0016°", ERG = "Refinery emergency plan" }
-        };
+            tanks = tanksFromApi.Select(t => new Tank
+            {
+                Id = (int)t.Id.GetHashCode(), // Convert Guid to int for compatibility
+                TankNumber = t.TankNumber,
+                BusinessUnit = t.BusinessUnit,
+                Location = t.Location ?? "",
+                ERG = t.ERG ?? "",
+                TankId = t.Id // Store actual Guid for API calls
+            }).ToList();
+        }
+    }
+
+    private async Task LoadBusinessUnitsAsync()
+    {
+        businessUnits = (await LookupApi.GetBusinessUnitsAsync())?.ToList() ?? new List<BusinessUnit>();
     }
 
     private void ApplyFiltering()
@@ -360,6 +374,7 @@
         public string BusinessUnit { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
         public string ERG { get; set; } = string.Empty;
+        public Guid TankId { get; set; } // For API calls
     }
 
     public class TableColumn

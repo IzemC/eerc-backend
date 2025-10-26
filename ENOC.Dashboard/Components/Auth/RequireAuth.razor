@@ -1,0 +1,41 @@
+@inject AuthStateService AuthState
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+@if (AuthState.IsAuthenticated)
+{
+    @ChildContent
+}
+else
+{
+    <div>
+        @{
+            Navigation.NavigateTo("/login", true);
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Subscribe to auth state changes
+        AuthState.OnAuthStateChanged += StateHasChanged;
+
+        // Try to initialize auth state (e.g., from stored token)
+        await AuthState.InitializeAsync();
+
+        // Redirect if not authenticated
+        if (!AuthState.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/login", true);
+        }
+    }
+
+    public void Dispose()
+    {
+        AuthState.OnAuthStateChanged -= StateHasChanged;
+    }
+}

@@ -30,7 +30,13 @@
 
 @code{
     [Parameter]
+    public Incident? CreatedIncident { get; set; }
+
+    [Parameter]
+    public IncidentFormState FormState { get; set; }
+
+    [Parameter]
     public Func<Task> onConfirm {get; set;}
 
-    public string incidentId = "202201013";
+    public string incidentId => CreatedIncident?.IncidentId ?? "N/A";
 }

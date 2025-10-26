@@ -1,8 +1,11 @@
 @using ENOC.Dashboard.Components.Layout
+@using ENOC.Dashboard.Models
 @page "/user-management"
 
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
+@inject UserApiService UserApi
+@inject LookupApiService LookupApi
 
 <PageTitle>Manage users</PageTitle>
 
@@ -133,13 +136,28 @@
                         <input type="text" class="form-control" placeholder="Full Name" @bind="currentUser.FullName" />
                     </div>
                     <div class="form-group search-box">
-                        <input type="text" class="form-control" placeholder="Team" @bind="currentUser.Team" />
-                    </div>
-                    <div class="form-group search-box">
-                        <input type="text" class="form-control" placeholder="Position" @bind="currentUser.Position" />
-                    </div>
-                    <div class="form-group search-box">
                         <input type="email" class="form-control" placeholder="Email" @bind="currentUser.Email" />
+                    </div>
+                    <div class="form-group search-box">
+                        <input type="text" class="form-control" placeholder="Employee ID" @bind="currentUser.EmployeeId" />
+                    </div>
+                    <div class="form-group search-box">
+                        <select class="form-control" @bind="selectedTeamId">
+                            <option value="">Select Team (Optional)</option>
+                            @foreach (var team in teams)
+                            {
+                                <option value="@team.Id">@team.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group search-box">
+                        <select class="form-control" @bind="selectedPositionId">
+                            <option value="">Select Position (Optional)</option>
+                            @foreach (var position in positions)
+                            {
+                                <option value="@position.Id">@position.Name</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -154,6 +172,8 @@
     private List<User> users = new();
     private List<User> filteredUsers = new();
     private List<User> currentPageUsers = new();
+    private List<Team> teams = new();
+    private List<EercPosition> positions = new();
     private User currentUser = new();
     private string searchTerm = string.Empty;
     private bool showModal = false;
@@ -162,6 +182,9 @@
     private int currentPage = 1;
     private int pageSize = 4;
     private int totalPages = 1;
+    private string selectedTeamId = "";
+    private string selectedPositionId = "";
+    private string currentUserEmployeeId = "";
 
     private List<TableColumn> tableColumns = new()
     {
@@ -171,23 +194,77 @@
         new TableColumn { DisplayName = "Email", PropertyName = "Email" }
     };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        LoadMockUsers();
+        await LoadUsersAsync();
+        await LoadLookupsAsync();
         ApplyFiltering();
     }
 
-    private void LoadMockUsers()
+    private async Task LoadUsersAsync()
     {
-        users = new List<User>
+        var usersFromApi = await UserApi.GetAllUsersAsync();
+        if (usersFromApi != null)
         {
-            new User { Id = 1, FullName = "Kelly J. Walker", Team = "Management", Position = "Station Fire Officer", Email = "Kelly.J.Walker@gmail.com" },
-            new User { Id = 2, FullName = "Alma Hryal Attia", Team = "Operation", Position = "Station Fire Officer", Email = "Alma.Hryal@gmail.com" },
-            new User { Id = 3, FullName = "Ilisa Fadi Isaa", Team = "Black team", Position = "Fire truck operator", Email = "Fadi.Isaa18@gmail.com" },
-            new User { Id = 4, FullName = "Farraj Rdwar Kanaan", Team = "Green team", Position = "Fire truck operator", Email = "RalfAbdul.MuhakRouzi@gmail.com" },
-            new User { Id = 5, FullName = "John Doe", Team = "Management", Position = "Team Lead", Email = "john.doe@gmail.com" },
-            new User { Id = 6, FullName = "Jane Smith", Team = "Operation", Position = "Operator", Email = "jane.smith@gmail.com" }
-        };
+            users = usersFromApi.Select(u => new User
+            {
+                Id = (int)u.Id.GetHashCode(), // Convert Guid to int for compatibility
+                FullName = u.FullName,
+                Team = GetTeamDisplay(u.Roles, u.TeamName),
+                Position = GetPositionDisplay(u.Roles, u.TeamName, u.PositionName),
+                Email = u.Email,
+                EmployeeId = u.EmployeeId,
+                TeamId = u.TeamId ?? Guid.Empty,
+                PositionId = u.PositionId ?? Guid.Empty,
+                UserGuid = u.Id // Store actual Guid for API calls
+            }).ToList();
+        }
+    }
+
+    private async Task LoadLookupsAsync()
+    {
+        teams = (await LookupApi.GetTeamsAsync())?.ToList() ?? new List<Team>();
+        positions = (await LookupApi.GetEercPositionsAsync())?.ToList() ?? new List<EercPosition>();
+    }
+
+    private string GetTeamDisplay(List<string> roles, string? teamName)
+    {
+        // If user has Management role, team is always "Management"
+        if (roles.Contains("Management", StringComparer.OrdinalIgnoreCase))
+        {
+            return "Management";
+        }
+
+        // If user has EERC role, show their color team
+        if (roles.Contains("EERC", StringComparer.OrdinalIgnoreCase))
+        {
+            return teamName ?? "Unassigned";
+        }
+
+        // Default
+        return teamName ?? "Unassigned";
+    }
+
+    private string GetPositionDisplay(List<string> roles, string? teamName, string? positionName)
+    {
+        // If user has Management role, position is always "Management"
+        if (roles.Contains("Management", StringComparer.OrdinalIgnoreCase))
+        {
+            return "Management";
+        }
+
+        // If user has EERC role with a color team, show team name in position column
+        if (roles.Contains("EERC", StringComparer.OrdinalIgnoreCase))
+        {
+            var colorTeams = new[] { "White", "Black", "Green", "Red" };
+            if (!string.IsNullOrEmpty(teamName) && colorTeams.Contains(teamName, StringComparer.OrdinalIgnoreCase))
+            {
+                return teamName;
+            }
+        }
+
+        // Default: show position name if available
+        return positionName ?? "Unassigned";
     }
 
     private void ApplyFiltering()
@@ -224,6 +301,9 @@
     private void ShowAddModal()
     {
         currentUser = new User();
+        selectedTeamId = "";
+        selectedPositionId = "";
+        currentUserEmployeeId = "";
         isEditing = false;
         showModal = true;
         StateHasChanged();
@@ -237,8 +317,14 @@
             FullName = user.FullName,
             Team = user.Team,
             Position = user.Position,
-            Email = user.Email
+            Email = user.Email,
+            TeamId = user.TeamId,
+            PositionId = user.PositionId,
+            EmployeeId = user.EmployeeId
         };
+        selectedTeamId = user.TeamId != Guid.Empty ? user.TeamId.ToString() : "";
+        selectedPositionId = user.PositionId != Guid.Empty ? user.PositionId.ToString() : "";
+        currentUserEmployeeId = user.EmployeeId;
         isEditing = true;
         showModal = true;
         activeActionMenu = 0;
@@ -249,33 +335,63 @@
     {
         if (await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this user?"))
         {
-            users.RemoveAll(u => u.Id == userId);
-            ApplyFiltering();
-            StateHasChanged();
+            var user = users.FirstOrDefault(u => u.Id == userId);
+            if (user != null)
+            {
+                var success = await UserApi.DeleteUserAsync(user.UserGuid);
+                if (success)
+                {
+                    await LoadUsersAsync();
+                    ApplyFiltering();
+                    StateHasChanged();
+                }
+            }
         }
         activeActionMenu = 0;
     }
 
-    private void SaveUser()
+    private async Task SaveUser()
     {
+        Guid? teamId = string.IsNullOrEmpty(selectedTeamId) ? null : Guid.Parse(selectedTeamId);
+        Guid? positionId = string.IsNullOrEmpty(selectedPositionId) ? null : Guid.Parse(selectedPositionId);
+
         if (isEditing)
         {
-            var existingUser = users.FirstOrDefault(u => u.Id == currentUser.Id);
-            if (existingUser != null)
+            var request = new UpdateUserRequest
             {
-                existingUser.FullName = currentUser.FullName;
-                existingUser.Team = currentUser.Team;
-                existingUser.Position = currentUser.Position;
-                existingUser.Email = currentUser.Email;
+                FullName = currentUser.FullName,
+                Email = currentUser.Email,
+                TeamId = teamId,
+                PositionId = positionId,
+                EmployeeId = currentUser.EmployeeId
+            };
+
+            var result = await UserApi.UpdateUserAsync(currentUser.UserGuid, request);
+            if (result != null)
+            {
+                await LoadUsersAsync();
+                ApplyFiltering();
             }
         }
         else
         {
-            currentUser.Id = users.Count > 0 ? users.Max(u => u.Id) + 1 : 1;
-            users.Add(currentUser);
+            var request = new CreateUserRequest
+            {
+                FullName = currentUser.FullName,
+                Email = currentUser.Email,
+                TeamId = teamId,
+                PositionId = positionId,
+                EmployeeId = currentUser.EmployeeId
+            };
+
+            var result = await UserApi.CreateUserAsync(request);
+            if (result != null)
+            {
+                await LoadUsersAsync();
+                ApplyFiltering();
+            }
         }
-        
-        ApplyFiltering();
+
         CloseModal();
     }
 
@@ -316,9 +432,10 @@
         return team.ToLower() switch
         {
             "management" => "team-badge badge-management",
-            "operation" => "team-badge badge-operation", 
-            "black team" => "team-badge badge-black",
-            "green team" => "team-badge badge-green",
+            "white" => "team-badge badge-default",
+            "black" => "team-badge badge-black",
+            "green" => "team-badge badge-green",
+            "red" => "team-badge badge-operation",
             _ => "team-badge badge-default"
         };
     }
@@ -330,6 +447,10 @@
         public string Team { get; set; } = string.Empty;
         public string Position { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string EmployeeId { get; set; } = string.Empty;
+        public Guid TeamId { get; set; } // For API calls
+        public Guid PositionId { get; set; } // For API calls
+        public Guid UserGuid { get; set; } // Actual Guid from API
     }
 
     public class TableColumn

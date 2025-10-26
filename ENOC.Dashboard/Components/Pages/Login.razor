@@ -1,0 +1,103 @@
+@page "/login"
+@using ENOC.Dashboard.Components.Layout
+@using ENOC.Dashboard.Services
+@inject AuthStateService AuthState
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Login - ENOC Dashboard</PageTitle>
+
+<HeaderNav Title="Login" />
+
+<div class="height-container" style="display: flex; align-items: center; justify-content: center;">
+    <div style="background: rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 12px; backdrop-filter: blur(10px); min-width: 400px;">
+        <h2 style="color: white; text-align: center; margin-bottom: 30px;">Sign In</h2>
+
+        <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin" FormName="LoginForm">
+            <DataAnnotationsValidator />
+
+            <div style="margin-bottom: 20px;">
+                <label style="color: white; display: block; margin-bottom: 8px;">Username</label>
+                <InputText @bind-Value="loginModel.Username" class="form-control" placeholder="Enter username" />
+                <ValidationMessage For="@(() => loginModel.Username)" style="color: #ff6b6b;" />
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="color: white; display: block; margin-bottom: 8px;">Password</label>
+                <InputText @bind-Value="loginModel.Password" type="password" class="form-control" placeholder="Enter password" />
+                <ValidationMessage For="@(() => loginModel.Password)" style="color: #ff6b6b;" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div style="background: rgba(255, 107, 107, 0.2); color: #ff6b6b; padding: 12px; border-radius: 6px; margin-bottom: 20px; text-align: center;">
+                    @errorMessage
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 16px; font-weight: 600;" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <span>Signing in...</span>
+                }
+                else
+                {
+                    <span>Sign In</span>
+                }
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private LoginModel loginModel = new();
+    private string? errorMessage;
+    private bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // If already authenticated, redirect to home
+        if (AuthState.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/", true);
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+
+            var success = await AuthState.LoginAsync(loginModel.Username, loginModel.Password);
+
+            if (success)
+            {
+                Navigation.NavigateTo("/", true);
+            }
+            else
+            {
+                errorMessage = "Invalid username or password. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "An error occurred during login. Please try again.";
+            Console.WriteLine($"Login error: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "Username is required")]
+        public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Password is required")]
+        public string Password { get; set; } = string.Empty;
+    }
+}

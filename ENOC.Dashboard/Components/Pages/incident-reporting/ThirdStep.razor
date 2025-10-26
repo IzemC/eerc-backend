@@ -1,3 +1,7 @@
+@rendermode InteractiveServer
+@using ENOC.Dashboard.Models
+@inject LookupApiService LookupApi
+
 <div class="teams-message">
     <div class="teams-section">
         <h3 class="header-font">Team</h3>
@@ -13,11 +17,11 @@
     <div class="teams-section" style="flex-shrink: 2;">
         <h3 class="header-font">Message</h3>
         <div class="messages search-box" style="max-width: 100%;">
-            <select class="form-select" @bind="selectedMessage">
-                <option value="" disabled selected>Select a message</option>
+            <select class="form-select" @bind="selectedMessageId" @bind:after="OnMessageSelected">
+                <option value="">Select a message</option>
                 @foreach (var message in Messages)
                 {
-                    <option value="@message">@message</option>
+                    <option value="@message.Id">@message.Description</option>
                 }
             </select>
         </div>
@@ -53,7 +57,13 @@
 
 @if (showConfirm == true)
 {
-    <button id="form-button" class="btn btn-secondary btn-aqua rect-button-confirm incident-form-button mt-2" @onclick="onConfirm">Confirm</button>
+    <button type="button"
+            id="form-button"
+            class="btn btn-secondary btn-aqua rect-button-confirm incident-form-button mt-2"
+            @onclick="HandleConfirm"
+            disabled="@(!CanConfirm)">
+        Confirm
+    </button>
 }
 
 @code {
@@ -63,19 +73,28 @@
     [Parameter]
     public bool? showConfirm { get; set; }
 
-    private List<string> Messages = new List<string>
-    {
-        "Message 1 content",
-        "Message 2 content",
-        "Message 3 content",
-        "Message 4 content",
-        "Message 5 content",
-        "Message 6 content"
-    };
+    [Parameter]
+    public IncidentFormState? FormState { get; set; }
 
-    private string selectedMessage;
+    private List<MessageModel> Messages = new();
+    private Guid? selectedMessageId;
+    private string selectedMessage = string.Empty;
     private bool showCustomMessageModal = false;
     private string customMessageText = string.Empty;
+
+    private bool CanConfirm => selectedMessageId.HasValue || !string.IsNullOrEmpty(customMessageText);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMessagesAsync();
+
+        // Load previous selections if any
+        if (FormState != null)
+        {
+            selectedMessageId = FormState.MessageId;
+            customMessageText = FormState.CustomMessage ?? string.Empty;
+        }
+    }
 
     protected override void OnParametersSet()
     {
@@ -83,6 +102,25 @@
         {
             showConfirm = true;
         }
+    }
+
+    private async Task LoadMessagesAsync()
+    {
+        var messages = await LookupApi.GetMessagesAsync();
+        if (messages != null)
+        {
+            Messages = messages.Select(m => new MessageModel
+            {
+                Id = m.Id,
+                Description = m.Description
+            }).ToList();
+        }
+    }
+
+    public class MessageModel
+    {
+        public Guid Id { get; set; }
+        public string Description { get; set; } = string.Empty;
     }
 
     private void OpenCustomMessageModal()
@@ -101,9 +139,33 @@
     {
         if (!string.IsNullOrWhiteSpace(customMessageText))
         {
-            Messages.Add(customMessageText);
-            selectedMessage = customMessageText;
+            selectedMessageId = null; // Clear selected message when using custom
+            if (FormState != null)
+            {
+                FormState.CustomMessage = customMessageText;
+                FormState.MessageId = null;
+            }
             CloseCustomMessageModal();
+        }
+    }
+
+    private void OnMessageSelected()
+    {
+        if (selectedMessageId.HasValue && FormState != null)
+        {
+            var message = Messages.FirstOrDefault(m => m.Id == selectedMessageId.Value);
+            FormState.MessageId = selectedMessageId.Value;
+            FormState.MessageText = message?.Description;
+            FormState.CustomMessage = null; // Clear custom message
+            customMessageText = string.Empty;
+        }
+    }
+
+    private async Task HandleConfirm()
+    {
+        if (CanConfirm && onConfirm != null)
+        {
+            await onConfirm();
         }
     }
 }
