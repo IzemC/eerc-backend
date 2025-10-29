@@ -13,10 +13,6 @@ public class CreateShiftReportRequest
     [Required]
     public DateTime To { get; set; }
 
-    public Guid? IncidentId { get; set; }
-
     [Required]
     public string Name { get; set; } = string.Empty;
-
-    public string? Details { get; set; }
 }

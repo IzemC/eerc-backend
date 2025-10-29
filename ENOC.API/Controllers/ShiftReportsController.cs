@@ -118,4 +118,134 @@ public class ShiftReportsController : ControllerBase
             return StatusCode(500, new { message = "An error occurred while deleting the shift report" });
         }
     }
+
+    /// <summary>
+    /// Add a vehicle status to a shift report
+    /// </summary>
+    [HttpPost("{id}/vehicle-statuses")]
+    public async Task<ActionResult<ShiftReportVehicleStatusResponse>> AddVehicleStatus(
+        Guid id,
+        [FromBody] AddShiftReportVehicleStatusRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var status = await _shiftReportService.AddVehicleStatusAsync(id, request.VehicleId, request.Description, cancellationToken);
+            if (status == null)
+            {
+                return BadRequest(new { message = "Failed to add vehicle status. Shift report or vehicle not found." });
+            }
+
+            _logger.LogInformation("Vehicle status added to shift report {ShiftReportId}", id);
+
+            return CreatedAtAction(nameof(GetVehicleStatuses), new { id }, status);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding vehicle status to shift report {Id}", id);
+            return StatusCode(500, new { message = "An error occurred while adding the vehicle status" });
+        }
+    }
+
+    /// <summary>
+    /// Add multiple vehicle statuses to a shift report at once
+    /// </summary>
+    [HttpPost("{id}/vehicle-statuses/bulk")]
+    public async Task<ActionResult<List<ShiftReportVehicleStatusResponse>>> AddBulkVehicleStatuses(
+        Guid id,
+        [FromBody] AddBulkVehicleStatusRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var statuses = await _shiftReportService.AddBulkVehicleStatusAsync(id, request, cancellationToken);
+            if (!statuses.Any())
+            {
+                return BadRequest(new { message = "Failed to add vehicle statuses. Shift report not found or no valid vehicles provided." });
+            }
+
+            _logger.LogInformation("Added {Count} vehicle statuses to shift report {ShiftReportId}", statuses.Count, id);
+
+            return Ok(statuses);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding bulk vehicle statuses to shift report {Id}", id);
+            return StatusCode(500, new { message = "An error occurred while adding the vehicle statuses" });
+        }
+    }
+
+    /// <summary>
+    /// Get all vehicle statuses for a shift report
+    /// </summary>
+    [HttpGet("{id}/vehicle-statuses")]
+    public async Task<ActionResult<IEnumerable<ShiftReportVehicleStatusResponse>>> GetVehicleStatuses(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var statuses = await _shiftReportService.GetVehicleStatusesByShiftReportIdAsync(id, cancellationToken);
+            return Ok(statuses);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving vehicle statuses for shift report {Id}", id);
+            return StatusCode(500, new { message = "An error occurred while retrieving vehicle statuses" });
+        }
+    }
+
+    /// <summary>
+    /// Delete a vehicle status
+    /// </summary>
+    [HttpDelete("vehicle-statuses/{statusId}")]
+    public async Task<ActionResult> DeleteVehicleStatus(Guid statusId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _shiftReportService.DeleteVehicleStatusAsync(statusId, cancellationToken);
+            if (!result)
+            {
+                return NotFound(new { message = "Vehicle status not found" });
+            }
+
+            return Ok(new { message = "Vehicle status deleted successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting vehicle status {StatusId}", statusId);
+            return StatusCode(500, new { message = "An error occurred while deleting the vehicle status" });
+        }
+    }
+
+    /// <summary>
+    /// Update activities for a shift report
+    /// </summary>
+    [HttpPut("{id}/activities")]
+    public async Task<ActionResult<ShiftReportResponse>> UpdateActivities(
+        Guid id,
+        [FromBody] UpdateActivitiesRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var report = await _shiftReportService.UpdateActivitiesAsync(id, request.Activities, cancellationToken);
+            if (report == null)
+            {
+                return NotFound(new { message = "Shift report not found" });
+            }
+
+            _logger.LogInformation("Activities updated for shift report {ShiftReportId}", id);
+
+            return Ok(report);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating activities for shift report {Id}", id);
+            return StatusCode(500, new { message = "An error occurred while updating activities" });
+        }
+    }
 }
+
+public record AddShiftReportVehicleStatusRequest(Guid VehicleId, string? Description);
+public record UpdateActivitiesRequest(string Activities);

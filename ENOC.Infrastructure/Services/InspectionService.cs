@@ -20,6 +20,14 @@ public class InspectionService : IInspectionService
     {
         try
         {
+            // Get user to copy their signature
+            var user = await _unitOfWork.Repository<ApplicationUser>().GetByIdAsync(userId, cancellationToken);
+            if (user == null)
+            {
+                _logger.LogError("User {UserId} not found when creating inspection", userId);
+                return null;
+            }
+
             // Generate inspection counter and ID
             var inspectionRepo = _unitOfWork.Repository<Inspection>();
             var lastInspection = (await inspectionRepo.GetAllAsync(cancellationToken))
@@ -38,6 +46,8 @@ public class InspectionService : IInspectionService
                 VehicleId = request.VehicleId,
                 Answers = request.Answers,
                 IsDefected = request.IsDefected,
+                UserSignature = user.Signature, // Copy user's signature image
+                UserSignatureContentType = user.SignatureContentType,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -66,6 +76,9 @@ public class InspectionService : IInspectionService
         var user = await _unitOfWork.Repository<ApplicationUser>().GetByIdAsync(inspection.UserId, cancellationToken);
         var vehicle = await _unitOfWork.Repository<Vehicle>().GetByIdAsync(inspection.VehicleId, cancellationToken);
 
+        // Get defects for this inspection
+        var defects = await GetDefectsByInspectionIdAsync(id, cancellationToken);
+
         return new InspectionResponse
         {
             Id = inspection.Id,
@@ -79,7 +92,10 @@ public class InspectionService : IInspectionService
             VehiclePlateNumber = vehicle?.PlateNumber,
             Answers = inspection.Answers,
             IsDefected = inspection.IsDefected,
-            CreatedAt = inspection.CreatedAt
+            UserSignature = inspection.UserSignature,
+            UserSignatureContentType = inspection.UserSignatureContentType,
+            CreatedAt = inspection.CreatedAt,
+            Defects = defects.ToList()
         };
     }
 
@@ -132,6 +148,108 @@ public class InspectionService : IInspectionService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Inspection {InspectionId} deleted", inspection.InspectionId);
+
+        return true;
+    }
+
+    public async Task<InspectionDefectResponse?> AddDefectAsync(Guid inspectionId, string questionId, string questionText, string description, byte[]? image, string? imageFileName, string? imageContentType, long? imageSize, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Verify inspection exists
+            var inspection = await _unitOfWork.Repository<Inspection>().GetByIdAsync(inspectionId, cancellationToken);
+            if (inspection == null)
+            {
+                return null;
+            }
+
+            var defect = new InspectionDefect
+            {
+                Id = Guid.NewGuid(),
+                InspectionId = inspectionId,
+                QuestionId = questionId,
+                QuestionText = questionText,
+                Description = description,
+                Image = image,
+                ImageFileName = imageFileName,
+                ImageContentType = imageContentType,
+                ImageSize = imageSize,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _unitOfWork.Repository<InspectionDefect>().AddAsync(defect, cancellationToken);
+
+            // Update inspection IsDefected flag
+            inspection.IsDefected = true;
+            _unitOfWork.Repository<Inspection>().Update(inspection);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Defect {DefectId} added to inspection {InspectionId}", defect.Id, inspectionId);
+
+            return new InspectionDefectResponse
+            {
+                Id = defect.Id,
+                InspectionId = defect.InspectionId,
+                QuestionId = defect.QuestionId,
+                QuestionText = defect.QuestionText,
+                Description = defect.Description,
+                HasImage = defect.Image != null,
+                ImageFileName = defect.ImageFileName,
+                ImageSize = defect.ImageSize,
+                CreatedAt = defect.CreatedAt
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding defect to inspection {InspectionId}", inspectionId);
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<InspectionDefectResponse>> GetDefectsByInspectionIdAsync(Guid inspectionId, CancellationToken cancellationToken = default)
+    {
+        var defects = (await _unitOfWork.Repository<InspectionDefect>().GetAllAsync(cancellationToken))
+            .Where(d => d.InspectionId == inspectionId)
+            .OrderBy(d => d.CreatedAt);
+
+        return defects.Select(d => new InspectionDefectResponse
+        {
+            Id = d.Id,
+            InspectionId = d.InspectionId,
+            QuestionId = d.QuestionId,
+            QuestionText = d.QuestionText,
+            Description = d.Description,
+            HasImage = d.Image != null,
+            ImageFileName = d.ImageFileName,
+            ImageSize = d.ImageSize,
+            CreatedAt = d.CreatedAt
+        });
+    }
+
+    public async Task<(byte[] content, string fileName, string contentType)?> GetDefectImageAsync(Guid defectId, CancellationToken cancellationToken = default)
+    {
+        var defect = await _unitOfWork.Repository<InspectionDefect>().GetByIdAsync(defectId, cancellationToken);
+        if (defect == null || defect.Image == null)
+        {
+            return null;
+        }
+
+        return (defect.Image, defect.ImageFileName ?? "defect-image", defect.ImageContentType ?? "application/octet-stream");
+    }
+
+    public async Task<bool> DeleteDefectAsync(Guid defectId, CancellationToken cancellationToken = default)
+    {
+        var defect = await _unitOfWork.Repository<InspectionDefect>().GetByIdAsync(defectId, cancellationToken);
+        if (defect == null)
+        {
+            return false;
+        }
+
+        _unitOfWork.Repository<InspectionDefect>().Remove(defect);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Defect {DefectId} deleted", defectId);
 
         return true;
     }

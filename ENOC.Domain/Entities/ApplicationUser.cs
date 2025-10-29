@@ -26,7 +26,9 @@ namespace ENOC.Domain.Entities
 
         public required string EmployeeId { get; set; }
 
-        public string? Signature { get; set; }
+        public byte[]? Signature { get; set; }
+
+        public string? SignatureContentType { get; set; }
 
         public Guid? AdId { get; set; }
     }

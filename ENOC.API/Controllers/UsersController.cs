@@ -133,4 +133,85 @@ public class UsersController : ControllerBase
             return StatusCode(500, new { message = "An error occurred while deleting the user" });
         }
     }
+
+    /// <summary>
+    /// Upload or update user signature
+    /// </summary>
+    [HttpPut("{id}/signature")]
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult> UpdateUserSignature(Guid id, IFormFile signature, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Validate signature file
+            if (signature == null || signature.Length == 0)
+            {
+                return BadRequest(new { message = "Signature image is required" });
+            }
+
+            // Validate file type
+            var allowedContentTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/bmp", "image/webp" };
+            if (!allowedContentTypes.Contains(signature.ContentType.ToLower()))
+            {
+                return BadRequest(new { message = $"File type {signature.ContentType} is not supported. Only images are allowed." });
+            }
+
+            // Validate file size (max 5MB for signatures)
+            const long maxFileSize = 5 * 1024 * 1024;
+            if (signature.Length > maxFileSize)
+            {
+                return BadRequest(new { message = "Signature image size exceeds 5MB limit" });
+            }
+
+            // Read signature content
+            byte[] signatureContent;
+            using (var memoryStream = new MemoryStream())
+            {
+                await signature.CopyToAsync(memoryStream, cancellationToken);
+                signatureContent = memoryStream.ToArray();
+            }
+
+            var result = await _userService.UpdateUserSignatureAsync(id, signatureContent, signature.ContentType, cancellationToken);
+            if (!result)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            _logger.LogInformation("Signature updated for user {UserId}", id);
+
+            return Ok(new { message = "Signature updated successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating signature for user {UserId}", id);
+            return StatusCode(500, new { message = "An error occurred while updating the signature" });
+        }
+    }
+
+    /// <summary>
+    /// Download user signature
+    /// </summary>
+    [HttpGet("{id}/signature")]
+    public async Task<IActionResult> GetUserSignature(Guid id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var signatureData = await _userService.GetUserSignatureAsync(id, cancellationToken);
+            if (signatureData == null)
+            {
+                return NotFound(new { message = "User signature not found" });
+            }
+
+            var (content, contentType) = signatureData.Value;
+
+            _logger.LogInformation("Signature downloaded for user {UserId}", id);
+
+            return File(content, contentType, $"user-{id}-signature.png");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error downloading signature for user {UserId}", id);
+            return StatusCode(500, new { message = "An error occurred while downloading the signature" });
+        }
+    }
 }

@@ -12,9 +12,8 @@ public class ShiftReportResponse
     public string TeamName { get; set; } = string.Empty;
     public DateTime From { get; set; }
     public DateTime To { get; set; }
-    public Guid? IncidentId { get; set; }
-    public string? IncidentNumber { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string? Details { get; set; }
+    public string? Activities { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    public List<ShiftReportVehicleStatusResponse> VehicleStatuses { get; set; } = new();
 }

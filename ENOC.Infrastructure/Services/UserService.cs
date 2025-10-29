@@ -206,4 +206,39 @@ public class UserService : IUserService
 
         return true;
     }
+
+    public async Task<bool> UpdateUserSignatureAsync(Guid userId, byte[] signature, string contentType, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null || user.IsDeleted)
+        {
+            return false;
+        }
+
+        user.Signature = signature;
+        user.SignatureContentType = contentType;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogError("Failed to update signature for user {UserId}: {Errors}", userId, errors);
+            return false;
+        }
+
+        _logger.LogInformation("Updated signature for user {UserId}", userId);
+
+        return true;
+    }
+
+    public async Task<(byte[] content, string contentType)?> GetUserSignatureAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null || user.IsDeleted || user.Signature == null)
+        {
+            return null;
+        }
+
+        return (user.Signature, user.SignatureContentType ?? "application/octet-stream");
+    }
 }

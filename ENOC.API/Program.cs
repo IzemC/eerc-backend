@@ -79,6 +79,23 @@ builder.Services.AddSwaggerGen(c =>
             Array.Empty<string>()
         }
     });
+
+    // Map IFormFile to proper OpenAPI schema for file uploads
+    c.MapType<IFormFile>(() => new Microsoft.OpenApi.Models.OpenApiSchema
+    {
+        Type = "string",
+        Format = "binary"
+    });
+
+    // Disable annotation for IFormFile binding source inference
+    c.UseInlineDefinitionsForEnums();
+    c.UseAllOfToExtendReferenceSchemas();
+
+    // Add file upload support - MUST be added after MapType
+    c.OperationFilter<ENOC.API.Filters.FileUploadOperationFilter>();
+
+    // Configure to handle multipart/form-data for IFormFile parameters
+    c.UseOneOfForPolymorphism();
 });
 
 var app = builder.Build();

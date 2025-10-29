@@ -27,12 +27,10 @@ public class ShiftReportForm
     [Required]
     public DateTime To { get; set; }
 
-    public Guid? IncidentId { get; set; }
-
     [Required]
     public string Name { get; set; } = string.Empty;
 
-    public string? Details { get; set; }
+    public string? Activities { get; set; }
 
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
@@ -40,5 +38,5 @@ public class ShiftReportForm
     // Navigation properties
     public ApplicationUser User { get; set; } = null!;
     public Team Team { get; set; } = null!;
-    public Incident? Incident { get; set; }
+    public ICollection<ShiftReportVehicleStatus> VehicleStatuses { get; set; } = new List<ShiftReportVehicleStatus>();
 }

@@ -27,10 +27,15 @@ public class Inspection
     [Required]
     public bool IsDefected { get; set; }
 
+    public byte[]? UserSignature { get; set; }
+
+    public string? UserSignatureContentType { get; set; }
+
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     // Navigation properties
     public ApplicationUser User { get; set; } = null!;
     public Vehicle Vehicle { get; set; } = null!;
+    public ICollection<InspectionDefect> Defects { get; set; } = new List<InspectionDefect>();
 }

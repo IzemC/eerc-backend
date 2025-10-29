@@ -48,6 +48,14 @@ public class Incident
 
     public string? Action { get; set; }
 
+    public string? Description { get; set; }
+
+    public DateTime? TimeOfTurnout { get; set; }
+
+    public DateTime? TimeOfArrival { get; set; }
+
+    public DateTime? TimeOfAllClear { get; set; }
+
     // Navigation properties
     public IncidentType IncidentType { get; set; } = null!;
     public BusinessUnit Unit { get; set; } = null!;

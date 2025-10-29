@@ -23,4 +23,12 @@ public class UpdateIncidentRequest
     public string? CustomMessage { get; set; }
 
     public string? Action { get; set; }
+
+    public string? Description { get; set; }
+
+    public DateTime? TimeOfTurnout { get; set; }
+
+    public DateTime? TimeOfArrival { get; set; }
+
+    public DateTime? TimeOfAllClear { get; set; }
 }

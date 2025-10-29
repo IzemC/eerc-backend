@@ -9,4 +9,8 @@ public interface IUserService
     Task<UserResponse> CreateUserAsync(CreateUserRequest request, CancellationToken cancellationToken = default);
     Task<UserResponse?> UpdateUserAsync(Guid userId, UpdateUserRequest request, CancellationToken cancellationToken = default);
     Task<bool> DeleteUserAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    // Signature methods
+    Task<bool> UpdateUserSignatureAsync(Guid userId, byte[] signature, string contentType, CancellationToken cancellationToken = default);
+    Task<(byte[] content, string contentType)?> GetUserSignatureAsync(Guid userId, CancellationToken cancellationToken = default);
 }

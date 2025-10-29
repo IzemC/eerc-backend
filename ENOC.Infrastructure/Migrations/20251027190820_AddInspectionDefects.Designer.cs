@@ -4,6 +4,7 @@ using ENOC.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ENOC.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251027190820_AddInspectionDefects")]
+    partial class AddInspectionDefects
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,10 +103,7 @@ namespace ENOC.Infrastructure.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<byte[]>("Signature")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("SignatureContentType")
+                    b.Property<string>("Signature")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("TeamId")
@@ -346,9 +346,6 @@ namespace ENOC.Infrastructure.Migrations
                     b.Property<string>("CustomMessage")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("IncidentCounter")
                         .HasColumnType("int");
 
@@ -376,15 +373,6 @@ namespace ENOC.Infrastructure.Migrations
 
                     b.Property<string>("Team")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("TimeOfAllClear")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("TimeOfArrival")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("TimeOfTurnout")
-                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("UnitId")
                         .HasColumnType("uniqueidentifier");
@@ -496,12 +484,6 @@ namespace ENOC.Infrastructure.Migrations
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<byte[]>("UserSignature")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("UserSignatureContentType")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("VehicleId")
                         .HasColumnType("uniqueidentifier");
@@ -725,14 +707,17 @@ namespace ENOC.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Activities")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("From")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("IncidentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -756,39 +741,13 @@ namespace ENOC.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IncidentId");
+
                     b.HasIndex("TeamId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("ShiftsReportForm");
-                });
-
-            modelBuilder.Entity("ENOC.Domain.Entities.ShiftReportVehicleStatus", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<Guid>("ShiftReportFormId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ShiftReportFormId");
-
-                    b.HasIndex("VehicleId");
-
-                    b.ToTable("ShiftReportVehicleStatuses");
                 });
 
             modelBuilder.Entity("ENOC.Domain.Entities.Tank", b =>
@@ -1319,6 +1278,10 @@ namespace ENOC.Infrastructure.Migrations
 
             modelBuilder.Entity("ENOC.Domain.Entities.ShiftReportForm", b =>
                 {
+                    b.HasOne("ENOC.Domain.Entities.Incident", "Incident")
+                        .WithMany()
+                        .HasForeignKey("IncidentId");
+
                     b.HasOne("ENOC.Domain.Entities.Team", "Team")
                         .WithMany("ShiftReportForms")
                         .HasForeignKey("TeamId")
@@ -1331,28 +1294,11 @@ namespace ENOC.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Incident");
+
                     b.Navigation("Team");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ENOC.Domain.Entities.ShiftReportVehicleStatus", b =>
-                {
-                    b.HasOne("ENOC.Domain.Entities.ShiftReportForm", "ShiftReportForm")
-                        .WithMany("VehicleStatuses")
-                        .HasForeignKey("ShiftReportFormId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ENOC.Domain.Entities.Vehicle", "Vehicle")
-                        .WithMany()
-                        .HasForeignKey("VehicleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ShiftReportForm");
-
-                    b.Navigation("Vehicle");
                 });
 
             modelBuilder.Entity("ENOC.Domain.Entities.Tank", b =>
@@ -1529,11 +1475,6 @@ namespace ENOC.Infrastructure.Migrations
             modelBuilder.Entity("ENOC.Domain.Entities.SCBA", b =>
                 {
                     b.Navigation("SCBAStatusEntries");
-                });
-
-            modelBuilder.Entity("ENOC.Domain.Entities.ShiftReportForm", b =>
-                {
-                    b.Navigation("VehicleStatuses");
                 });
 
             modelBuilder.Entity("ENOC.Domain.Entities.Tank", b =>

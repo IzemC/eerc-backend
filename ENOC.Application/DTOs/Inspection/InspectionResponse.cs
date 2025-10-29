@@ -13,5 +13,8 @@ public class InspectionResponse
     public string? VehiclePlateNumber { get; set; }
     public string Answers { get; set; } = string.Empty;
     public bool IsDefected { get; set; }
+    public byte[]? UserSignature { get; set; }
+    public string? UserSignatureContentType { get; set; }
     public DateTime CreatedAt { get; set; }
+    public List<InspectionDefectResponse> Defects { get; set; } = new();
 }

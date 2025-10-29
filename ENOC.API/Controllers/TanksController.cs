@@ -93,10 +93,11 @@ public class TanksController : ControllerBase
     /// Upload a file for a tank
     /// </summary>
     [HttpPost("{tankId}/files")]
+    [Consumes("multipart/form-data")]
     public async Task<ActionResult<TankFileResponse>> UploadFile(
         Guid tankId,
-        [FromForm] IFormFile file,
-        [FromForm] FileType fileType,
+        IFormFile file,
+        FileType fileType,
         CancellationToken cancellationToken)
     {
         try

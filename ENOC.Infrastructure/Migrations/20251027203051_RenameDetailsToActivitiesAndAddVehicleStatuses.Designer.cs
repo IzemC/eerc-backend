@@ -4,6 +4,7 @@ using ENOC.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ENOC.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251027203051_RenameDetailsToActivitiesAndAddVehicleStatuses")]
+    partial class RenameDetailsToActivitiesAndAddVehicleStatuses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -346,9 +349,6 @@ namespace ENOC.Infrastructure.Migrations
                     b.Property<string>("CustomMessage")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("IncidentCounter")
                         .HasColumnType("int");
 
@@ -376,15 +376,6 @@ namespace ENOC.Infrastructure.Migrations
 
                     b.Property<string>("Team")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("TimeOfAllClear")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("TimeOfArrival")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("TimeOfTurnout")
-                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("UnitId")
                         .HasColumnType("uniqueidentifier");
@@ -726,6 +717,7 @@ namespace ENOC.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Activities")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")

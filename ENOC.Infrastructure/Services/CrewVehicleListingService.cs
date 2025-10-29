@@ -330,4 +330,440 @@ public class CrewVehicleListingService : ICrewVehicleListingService
 
         return true;
     }
+
+    // Team status methods
+    public async Task<TeamStatusResponse?> AddTeamStatusAsync(Guid crewVehicleListingId, AddTeamStatusRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Validate crew vehicle listing exists
+            var form = await _unitOfWork.Repository<CrewVehicleListingForm>().GetByIdAsync(crewVehicleListingId, cancellationToken);
+            if (form == null)
+            {
+                _logger.LogWarning("Crew vehicle listing {ListingId} not found", crewVehicleListingId);
+                return null;
+            }
+
+            // Validate user exists
+            var user = await _unitOfWork.Repository<ApplicationUser>().GetByIdAsync(request.UserId, cancellationToken);
+            if (user == null)
+            {
+                _logger.LogWarning("User {UserId} not found", request.UserId);
+                return null;
+            }
+
+            // Validate employee status exists
+            var employeeStatus = await _unitOfWork.Repository<EmployeeStatus>().GetByIdAsync(request.EmployeeStatusId, cancellationToken);
+            if (employeeStatus == null)
+            {
+                _logger.LogWarning("Employee status {StatusId} not found", request.EmployeeStatusId);
+                return null;
+            }
+
+            // Validate vehicle if provided
+            Vehicle? vehicle = null;
+            if (request.VehicleId.HasValue)
+            {
+                vehicle = await _unitOfWork.Repository<Vehicle>().GetByIdAsync(request.VehicleId.Value, cancellationToken);
+                if (vehicle == null)
+                {
+                    _logger.LogWarning("Vehicle {VehicleId} not found", request.VehicleId);
+                    return null;
+                }
+            }
+
+            var entry = new TeamStatusEntry
+            {
+                Id = Guid.NewGuid(),
+                CrewVehicleListingFormId = crewVehicleListingId,
+                UserId = request.UserId,
+                EmployeeStatusId = request.EmployeeStatusId,
+                VehicleId = request.VehicleId,
+                Remarks = request.Remarks
+            };
+
+            await _unitOfWork.Repository<TeamStatusEntry>().AddAsync(entry, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Team status entry {EntryId} added to crew vehicle listing {ListingId}", entry.Id, crewVehicleListingId);
+
+            return new TeamStatusResponse
+            {
+                Id = entry.Id,
+                UserId = entry.UserId,
+                UserName = user.UserName ?? "Unknown",
+                EmployeeStatusId = entry.EmployeeStatusId,
+                EmployeeStatusName = employeeStatus.Name,
+                VehicleId = entry.VehicleId,
+                VehicleName = vehicle?.Name,
+                Remarks = entry.Remarks
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding team status entry");
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<TeamStatusResponse>> GetTeamStatusesByListingIdAsync(Guid crewVehicleListingId, CancellationToken cancellationToken = default)
+    {
+        var entries = (await _unitOfWork.Repository<TeamStatusEntry>().GetAllAsync(cancellationToken))
+            .Where(t => t.CrewVehicleListingFormId == crewVehicleListingId)
+            .ToList();
+
+        var responses = new List<TeamStatusResponse>();
+        foreach (var entry in entries)
+        {
+            var user = await _unitOfWork.Repository<ApplicationUser>().GetByIdAsync(entry.UserId, cancellationToken);
+            var employeeStatus = await _unitOfWork.Repository<EmployeeStatus>().GetByIdAsync(entry.EmployeeStatusId, cancellationToken);
+            var vehicle = entry.VehicleId.HasValue
+                ? await _unitOfWork.Repository<Vehicle>().GetByIdAsync(entry.VehicleId.Value, cancellationToken)
+                : null;
+
+            responses.Add(new TeamStatusResponse
+            {
+                Id = entry.Id,
+                UserId = entry.UserId,
+                UserName = user?.UserName ?? "Unknown",
+                EmployeeStatusId = entry.EmployeeStatusId,
+                EmployeeStatusName = employeeStatus?.Name ?? "Unknown",
+                VehicleId = entry.VehicleId,
+                VehicleName = vehicle?.Name,
+                Remarks = entry.Remarks
+            });
+        }
+
+        return responses;
+    }
+
+    public async Task<bool> DeleteTeamStatusAsync(Guid teamStatusId, CancellationToken cancellationToken = default)
+    {
+        var entry = await _unitOfWork.Repository<TeamStatusEntry>().GetByIdAsync(teamStatusId, cancellationToken);
+        if (entry == null)
+        {
+            return false;
+        }
+
+        _unitOfWork.Repository<TeamStatusEntry>().Remove(entry);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Team status entry {EntryId} deleted", teamStatusId);
+
+        return true;
+    }
+
+    // Vehicle status methods
+    public async Task<VehicleStatusResponse?> AddVehicleStatusAsync(Guid crewVehicleListingId, AddVehicleStatusRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Validate crew vehicle listing exists
+            var form = await _unitOfWork.Repository<CrewVehicleListingForm>().GetByIdAsync(crewVehicleListingId, cancellationToken);
+            if (form == null)
+            {
+                _logger.LogWarning("Crew vehicle listing {ListingId} not found", crewVehicleListingId);
+                return null;
+            }
+
+            // Validate vehicle exists
+            var vehicle = await _unitOfWork.Repository<Vehicle>().GetByIdAsync(request.VehicleId, cancellationToken);
+            if (vehicle == null)
+            {
+                _logger.LogWarning("Vehicle {VehicleId} not found", request.VehicleId);
+                return null;
+            }
+
+            var entry = new FireVehicleStatusEntry
+            {
+                Id = Guid.NewGuid(),
+                CrewVehicleListingFormId = crewVehicleListingId,
+                VehicleId = request.VehicleId,
+                In = request.In,
+                Out = request.Out,
+                Rs = request.Rs,
+                Remarks = request.Remarks
+            };
+
+            await _unitOfWork.Repository<FireVehicleStatusEntry>().AddAsync(entry, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Vehicle status entry {EntryId} added to crew vehicle listing {ListingId}", entry.Id, crewVehicleListingId);
+
+            return new VehicleStatusResponse
+            {
+                Id = entry.Id,
+                VehicleId = entry.VehicleId,
+                VehicleName = vehicle.Name,
+                In = entry.In,
+                Out = entry.Out,
+                Rs = entry.Rs,
+                Remarks = entry.Remarks
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding vehicle status entry");
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<VehicleStatusResponse>> GetVehicleStatusesByListingIdAsync(Guid crewVehicleListingId, CancellationToken cancellationToken = default)
+    {
+        var entries = (await _unitOfWork.Repository<FireVehicleStatusEntry>().GetAllAsync(cancellationToken))
+            .Where(v => v.CrewVehicleListingFormId == crewVehicleListingId)
+            .ToList();
+
+        var responses = new List<VehicleStatusResponse>();
+        foreach (var entry in entries)
+        {
+            var vehicle = await _unitOfWork.Repository<Vehicle>().GetByIdAsync(entry.VehicleId, cancellationToken);
+
+            responses.Add(new VehicleStatusResponse
+            {
+                Id = entry.Id,
+                VehicleId = entry.VehicleId,
+                VehicleName = vehicle?.Name ?? "Unknown",
+                In = entry.In,
+                Out = entry.Out,
+                Rs = entry.Rs,
+                Remarks = entry.Remarks
+            });
+        }
+
+        return responses;
+    }
+
+    public async Task<bool> DeleteVehicleStatusAsync(Guid vehicleStatusId, CancellationToken cancellationToken = default)
+    {
+        var entry = await _unitOfWork.Repository<FireVehicleStatusEntry>().GetByIdAsync(vehicleStatusId, cancellationToken);
+        if (entry == null)
+        {
+            return false;
+        }
+
+        _unitOfWork.Repository<FireVehicleStatusEntry>().Remove(entry);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Vehicle status entry {EntryId} deleted", vehicleStatusId);
+
+        return true;
+    }
+
+    // SCBA status methods
+    public async Task<SCBAStatusResponse?> AddSCBAStatusAsync(Guid crewVehicleListingId, AddSCBAStatusRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Validate crew vehicle listing exists
+            var form = await _unitOfWork.Repository<CrewVehicleListingForm>().GetByIdAsync(crewVehicleListingId, cancellationToken);
+            if (form == null)
+            {
+                _logger.LogWarning("Crew vehicle listing {ListingId} not found", crewVehicleListingId);
+                return null;
+            }
+
+            // Validate SCBA exists
+            var scba = await _unitOfWork.Repository<SCBA>().GetByIdAsync(request.SCBAId, cancellationToken);
+            if (scba == null)
+            {
+                _logger.LogWarning("SCBA {SCBAId} not found", request.SCBAId);
+                return null;
+            }
+
+            // Validate vehicle if provided
+            Vehicle? vehicle = null;
+            if (request.VehicleId.HasValue)
+            {
+                vehicle = await _unitOfWork.Repository<Vehicle>().GetByIdAsync(request.VehicleId.Value, cancellationToken);
+                if (vehicle == null)
+                {
+                    _logger.LogWarning("Vehicle {VehicleId} not found", request.VehicleId);
+                    return null;
+                }
+            }
+
+            var entry = new SCBAStatusEntry
+            {
+                Id = Guid.NewGuid(),
+                CrewVehicleListingFormId = crewVehicleListingId,
+                SCBAId = request.SCBAId,
+                VehicleId = request.VehicleId,
+                CylinderPressure = request.CylinderPressure,
+                In = request.In,
+                Out = request.Out,
+                Rs = request.Rs,
+                Remarks = request.Remarks
+            };
+
+            await _unitOfWork.Repository<SCBAStatusEntry>().AddAsync(entry, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("SCBA status entry {EntryId} added to crew vehicle listing {ListingId}", entry.Id, crewVehicleListingId);
+
+            return new SCBAStatusResponse
+            {
+                Id = entry.Id,
+                SCBAId = entry.SCBAId,
+                SCBAName = scba.Name,
+                VehicleId = entry.VehicleId,
+                VehicleName = vehicle?.Name,
+                CylinderPressure = entry.CylinderPressure,
+                In = entry.In,
+                Out = entry.Out,
+                Rs = entry.Rs,
+                Remarks = entry.Remarks
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding SCBA status entry");
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<SCBAStatusResponse>> GetSCBAStatusesByListingIdAsync(Guid crewVehicleListingId, CancellationToken cancellationToken = default)
+    {
+        var entries = (await _unitOfWork.Repository<SCBAStatusEntry>().GetAllAsync(cancellationToken))
+            .Where(s => s.CrewVehicleListingFormId == crewVehicleListingId)
+            .ToList();
+
+        var responses = new List<SCBAStatusResponse>();
+        foreach (var entry in entries)
+        {
+            var scba = await _unitOfWork.Repository<SCBA>().GetByIdAsync(entry.SCBAId, cancellationToken);
+            var vehicle = entry.VehicleId.HasValue
+                ? await _unitOfWork.Repository<Vehicle>().GetByIdAsync(entry.VehicleId.Value, cancellationToken)
+                : null;
+
+            responses.Add(new SCBAStatusResponse
+            {
+                Id = entry.Id,
+                SCBAId = entry.SCBAId,
+                SCBAName = scba?.Name ?? "Unknown",
+                VehicleId = entry.VehicleId,
+                VehicleName = vehicle?.Name,
+                CylinderPressure = entry.CylinderPressure,
+                In = entry.In,
+                Out = entry.Out,
+                Rs = entry.Rs,
+                Remarks = entry.Remarks
+            });
+        }
+
+        return responses;
+    }
+
+    public async Task<bool> DeleteSCBAStatusAsync(Guid scbaStatusId, CancellationToken cancellationToken = default)
+    {
+        var entry = await _unitOfWork.Repository<SCBAStatusEntry>().GetByIdAsync(scbaStatusId, cancellationToken);
+        if (entry == null)
+        {
+            return false;
+        }
+
+        _unitOfWork.Repository<SCBAStatusEntry>().Remove(entry);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("SCBA status entry {EntryId} deleted", scbaStatusId);
+
+        return true;
+    }
+
+    // Radio status methods
+    public async Task<RadioStatusResponse?> AddRadioStatusAsync(Guid crewVehicleListingId, AddRadioStatusRequest request, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // Validate crew vehicle listing exists
+            var form = await _unitOfWork.Repository<CrewVehicleListingForm>().GetByIdAsync(crewVehicleListingId, cancellationToken);
+            if (form == null)
+            {
+                _logger.LogWarning("Crew vehicle listing {ListingId} not found", crewVehicleListingId);
+                return null;
+            }
+
+            // Validate radio exists
+            var radio = await _unitOfWork.Repository<Radio>().GetByIdAsync(request.RadioId, cancellationToken);
+            if (radio == null)
+            {
+                _logger.LogWarning("Radio {RadioId} not found", request.RadioId);
+                return null;
+            }
+
+            var entry = new RadioStatusEntry
+            {
+                Id = Guid.NewGuid(),
+                CrewVehicleListingFormId = crewVehicleListingId,
+                RadioId = request.RadioId,
+                In = request.In,
+                Out = request.Out,
+                Rs = request.Rs,
+                Remarks = request.Remarks
+            };
+
+            await _unitOfWork.Repository<RadioStatusEntry>().AddAsync(entry, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Radio status entry {EntryId} added to crew vehicle listing {ListingId}", entry.Id, crewVehicleListingId);
+
+            return new RadioStatusResponse
+            {
+                Id = entry.Id,
+                RadioId = entry.RadioId,
+                RadioName = radio.Name,
+                In = entry.In,
+                Out = entry.Out,
+                Rs = entry.Rs,
+                Remarks = entry.Remarks
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error adding radio status entry");
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<RadioStatusResponse>> GetRadioStatusesByListingIdAsync(Guid crewVehicleListingId, CancellationToken cancellationToken = default)
+    {
+        var entries = (await _unitOfWork.Repository<RadioStatusEntry>().GetAllAsync(cancellationToken))
+            .Where(r => r.CrewVehicleListingFormId == crewVehicleListingId)
+            .ToList();
+
+        var responses = new List<RadioStatusResponse>();
+        foreach (var entry in entries)
+        {
+            var radio = await _unitOfWork.Repository<Radio>().GetByIdAsync(entry.RadioId, cancellationToken);
+
+            responses.Add(new RadioStatusResponse
+            {
+                Id = entry.Id,
+                RadioId = entry.RadioId,
+                RadioName = radio?.Name ?? "Unknown",
+                In = entry.In,
+                Out = entry.Out,
+                Rs = entry.Rs,
+                Remarks = entry.Remarks
+            });
+        }
+
+        return responses;
+    }
+
+    public async Task<bool> DeleteRadioStatusAsync(Guid radioStatusId, CancellationToken cancellationToken = default)
+    {
+        var entry = await _unitOfWork.Repository<RadioStatusEntry>().GetByIdAsync(radioStatusId, cancellationToken);
+        if (entry == null)
+        {
+            return false;
+        }
+
+        _unitOfWork.Repository<RadioStatusEntry>().Remove(entry);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("Radio status entry {EntryId} deleted", radioStatusId);
+
+        return true;
+    }
 }

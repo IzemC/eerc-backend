@@ -28,6 +28,10 @@ public class IncidentResponse
     public string? Team { get; set; }
     public string? CustomMessage { get; set; }
     public string? Action { get; set; }
+    public string? Description { get; set; }
+    public DateTime? TimeOfTurnout { get; set; }
+    public DateTime? TimeOfArrival { get; set; }
+    public DateTime? TimeOfAllClear { get; set; }
     public List<IncidentAcknowledgementResponse> Acknowledgements { get; set; } = new();
 }
 

@@ -137,6 +137,10 @@ public class IncidentService : IIncidentService
             Team = incident.Team,
             CustomMessage = incident.CustomMessage,
             Action = incident.Action,
+            Description = incident.Description,
+            TimeOfTurnout = incident.TimeOfTurnout,
+            TimeOfArrival = incident.TimeOfArrival,
+            TimeOfAllClear = incident.TimeOfAllClear,
             Acknowledgements = ackResponses
         };
     }
@@ -218,6 +222,18 @@ public class IncidentService : IIncidentService
 
         if (request.Action != null)
             incident.Action = request.Action;
+
+        if (request.Description != null)
+            incident.Description = request.Description;
+
+        if (request.TimeOfTurnout.HasValue)
+            incident.TimeOfTurnout = request.TimeOfTurnout;
+
+        if (request.TimeOfArrival.HasValue)
+            incident.TimeOfArrival = request.TimeOfArrival;
+
+        if (request.TimeOfAllClear.HasValue)
+            incident.TimeOfAllClear = request.TimeOfAllClear;
 
         _unitOfWork.Repository<Incident>().Update(incident);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

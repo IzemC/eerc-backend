@@ -18,8 +18,10 @@ namespace ENOC.Infrastructure.Data
 
         // Report/Form entities
         public DbSet<ShiftReportForm> ShiftReportForms { get; set; }
+        public DbSet<ShiftReportVehicleStatus> ShiftReportVehicleStatuses { get; set; }
         public DbSet<CrewVehicleListingForm> CrewVehicleListingForms { get; set; }
         public DbSet<Inspection> Inspections { get; set; }
+        public DbSet<InspectionDefect> InspectionDefects { get; set; }
 
         // Status entry entities
         public DbSet<TeamStatusEntry> TeamStatusEntries { get; set; }
@@ -185,6 +187,26 @@ namespace ENOC.Infrastructure.Data
                 .HasOne(i => i.Vehicle)
                 .WithMany(v => v.Inspections)
                 .HasForeignKey(i => i.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // InspectionDefect relationships
+            builder.Entity<InspectionDefect>()
+                .HasOne(id => id.Inspection)
+                .WithMany(i => i.Defects)
+                .HasForeignKey(id => id.InspectionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ShiftReportVehicleStatus relationships
+            builder.Entity<ShiftReportVehicleStatus>()
+                .HasOne(vs => vs.ShiftReportForm)
+                .WithMany(sr => sr.VehicleStatuses)
+                .HasForeignKey(vs => vs.ShiftReportFormId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<ShiftReportVehicleStatus>()
+                .HasOne(vs => vs.Vehicle)
+                .WithMany()
+                .HasForeignKey(vs => vs.VehicleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Tank relationships
